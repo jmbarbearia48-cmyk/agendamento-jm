@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>JM Barbearia - Agendamento</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#0b0b0b;
+  color:#fff;
+}
+header{
+  padding:20px;
+  text-align:center;
+  background:#000;
+}
+header h1{color:#25d366;margin:0}
+
+.container{
+  padding:20px;
+  max-width:900px;
+  margin:auto;
+}
+
+.step{display:none; animation:fadeUp .35s ease}
+.step.active{display:block}
+
+@keyframes fadeUp{
+  from{opacity:0; transform:translateY(20px)}
+  to{opacity:1; transform:translateY(0)}
+}
+
+h2{margin:10px 0 15px}
+
+input{
+  width:100%;
+  padding:14px;
+  border-radius:10px;
+  border:none;
+  font-size:16px;
+}
+
+.continuar{
+  margin-top:20px;
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:12px;
+  background:#25d366;
+  color:#000;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.horizontal{
+  display:flex;
+  gap:16px;
+  overflow-x:auto;
+  padding:10px 0;
+}
+
+/* SERVIÇOS */
+.card{
+  position:relative;
+  flex:0 0 auto;
+  width:260px;
+  height:150px;
+  background:#1e1e1e;
+  border-radius:18px;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+  border:2px solid #2a2a2a;
+  transition:.25s;
+}
+.card h3{margin:0;font-size:20px}
+.card span{font-size:18px;font-weight:bold;color:#25d366}
+
+.card::after{
+  content:"";
+  width:26px;
+  height:26px;
+  border:2px solid #25d366;
+  border-radius:6px;
+  position:absolute;
+  top:10px;
+  right:10px;
+  display:none;
+}
+.card::before{
+  content:"✔";
+  position:absolute;
+  top:10px;
+  right:15px;
+  font-size:18px;
+  color:#25d366;
+  display:none;
+}
+.card.active::after,
+.card.active::before{display:block}
+
+.card.active{
+  border-color:#25d366;
+  background:#242424;
+  transform:scale(1.04);
+}
+
+/* DIAS */
+.dia-card{
+  flex:0 0 auto;
+  width:110px;
+  height:140px;
+  border-radius:20px;
+  background:#1a1a1a;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  cursor:pointer;
+  border:2px solid #1f1f1f;
+}
+.dia-card.active{
+  border-color:#25d366;
+  background:#000;
+}
+
+/* HORÁRIOS */
+.hora-card{
+  flex:0 0 auto;
+  width:160px;
+  height:70px;
+  border-radius:22px;
+  background:#3f444c;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  cursor:pointer;
+}
+.hora-card.active{
+  background:#25d366;
+  color:#000;
+}
+
+#msgEsgotado {
+  display: none;
+  background: #ff4d4d;
+  color: #fff;
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.whatsapp{
+  margin-top:25px;
+  width:100%;
+  padding:18px;
+  border:none;
+  border-radius:14px;
+  background:#25d366;
+  color:#000;
+  font-size:17px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.whatsapp:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>JM Barbearia</h1>
+</header>
+
+<div class="container">
+
+<div class="step active" id="step1">
+  <h2>Olá, sou o atendente virtual da JM Barbearia, qual seu nome e sobrenome?</h2>
+  <input id="nome" placeholder="Nome e sobrenome" />
+  <button class="continuar" id="btnStep1">Continuar</button>
+</div>
+
+<div class="step" id="step2">
+  <h2 id="tituloServicos">Escolha os serviços</h2>
+  <div class="horizontal">
+    <div class="card" data-service="Corte" data-price="25"><h3>Corte</h3><span>R$25</span></div>
+    <div class="card" data-service="Corte Social" data-price="20"><h3>Corte Social</h3><span>R$20</span></div>
+    <div class="card" data-service="Corte + Cavanhaque" data-price="30"><h3>Corte + Cavanhaque</h3><span>R$30</span></div>
+    <div class="card" data-service="Corte + Barba" data-price="40"><h3>Corte + Barba</h3><span>R$40</span></div>
+    <div class="card" data-service="Corte + Pigmentação" data-price="45"><h3>Corte + Pigmentação</h3><span>R$45</span></div>
+    <div class="card" data-service="Barba" data-price="15"><h3>Barba</h3><span>R$15</span></div>
+    <div class="card" data-service="Sobrancelha" data-price="5"><h3>Sobrancelha</h3><span>R$5</span></div>
+    <div class="card" data-service="Pezinho" data-price="5"><h3>Pezinho</h3><span>R$5</span></div>
+  </div>
+  <button class="continuar" id="btnStep2">Continuar</button>
+</div>
+
+<div class="step" id="step3">
+  <h2>Escolha o dia</h2>
+  <div class="horizontal" id="dias"></div>
+  <button class="continuar" id="btnStep3">Continuar</button>
+</div>
+
+<div class="step" id="step4">
+  <h2>Escolha o horário</h2>
+  <div id="loadingHoras" style="display:none; color:#25d366; margin-bottom:10px;">Verificando horários disponíveis...</div>
+  <div id="msgEsgotado">⚠️ Ops! Todos os horários para este dia já foram marcados. Por favor, escolha outro dia.</div>
+
+  <div class="horizontal" id="containerHoras">
+    <div class="hora-card" data-time="17:00">17:00</div>
+    <div class="hora-card" data-time="18:00">18:00</div>
+    <div class="hora-card" data-time="19:00">19:00</div>
+    <div class="hora-card" data-time="20:00">20:00</div>
+    <div class="hora-card" data-time="21:00">21:00</div>
+  </div>
+
+  <button class="whatsapp" id="btnAgendar">Agendar pelo WhatsApp</button>
+</div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCVUmJ6w44XKuINSEyl62F7PkhoN6JAVG4",
+  authDomain: "jmbarbearia-efe18.firebaseapp.com",
+  projectId: "jmbarbearia-efe18",
+  storageBucket: "jmbarbearia-efe18.firebasestorage.app",
+  messagingSenderId: "787951187504",
+  appId: "1:787951187504:web:3e02b2848abd9dfdda9ff5"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let nome="", servicos=[], total=0, dia="", horario="";
+
+async function filtrarHorariosOcupados(diaEscolhido) {
+  const loader = document.getElementById("loadingHoras");
+  const msgErro = document.getElementById("msgEsgotado");
+  const containerHoras = document.getElementById("containerHoras");
+  const btnAgendar = document.getElementById("btnAgendar");
+  const cards = document.querySelectorAll(".hora-card");
+  
+  loader.style.display = "block";
+  msgErro.style.display = "none";
+  containerHoras.style.display = "flex";
+  btnAgendar.style.display = "block";
+  horario = "";
+  
+  cards.forEach(c => {
+    c.style.display = "flex";
+    c.classList.remove("active");
+  });
+
+  try {
+    const q = query(collection(db, "agendamento"), where("dia", "==", diaEscolhido));
+    const querySnapshot = await getDocs(q);
+    
+    querySnapshot.forEach((doc) => {
+      const hOcupado = doc.data().horario;
+      const cardParaEsconder = document.querySelector(`.hora-card[data-time="${hOcupado}"]`);
+      if(cardParaEsconder) cardParaEsconder.style.display = "none";
+    });
+
+    let disponiveis = 0;
+    cards.forEach(c => { if(c.style.display !== "none") disponiveis++; });
+
+    if(disponiveis === 0) {
+      msgErro.style.display = "block";
+      containerHoras.style.display = "none";
+      btnAgendar.style.display = "none";
+    }
+  } catch (e) { console.error(e); }
+  loader.style.display = "none";
+}
+
+window.nextStep = (n) => {
+  if(n===2){
+    nome=document.getElementById("nome").value.trim();
+    if(!nome){alert("Digite seu nome");return;}
+    document.getElementById("tituloServicos").innerText = `Olá, ${nome.split(" ")[0]}, qual serviço deseja?`;
+  }
+  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
+  document.getElementById("step"+n).classList.add("active");
+};
+
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('click', () => {
+    card.classList.toggle('active');
+    const nomeS = card.getAttribute('data-service');
+    const preco = parseInt(card.getAttribute('data-price'));
+    const index = servicos.findIndex(s => s.nome === nomeS);
+    if(index > -1){ servicos.splice(index, 1); total-=preco; }
+    else { servicos.push({nome:nomeS,preco}); total+=preco; }
+  });
+});
+
+document.querySelectorAll('.hora-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll(".hora-card").forEach(c=>c.classList.remove("active"));
+    card.classList.add("active");
+    horario = card.getAttribute('data-time');
+  });
+});
+
+const diasContainer=document.getElementById("dias");
+const diasSemana=["DOM","SEG","TER","QUA","QUI","SEX","SAB"];
+
+function gerarDias(){
+  diasContainer.innerHTML="";
+  // --- CORREÇÃO DE FUSO HORÁRIO (Sempre Brasília UTC-3) ---
+  let agora = new Date();
+  let utc = agora.getTime() + (agora.getTimezoneOffset() * 60000);
+  let data = new Date(utc + (3600000 * -3));
+
+  while(diasContainer.children.length < 5){
+    const d = data.getDay();
+    if(d >= 2 && d <= 5){ 
+      const card = document.createElement("div");
+      card.className = "dia-card";
+      const numDia = data.getDate();
+      const nomeDia = diasSemana[d];
+      card.innerHTML = `<strong>${nomeDia}</strong><span>${numDia}</span>`;
+      card.onclick = async () => {
+        document.querySelectorAll(".dia-card").forEach(c=>c.classList.remove("active"));
+        card.classList.add("active");
+        dia = `${nomeDia} ${numDia}`;
+        await filtrarHorariosOcupados(dia);
+      };
+      diasContainer.appendChild(card);
+    }
+    data.setDate(data.getDate()+1);
+  }
+}
+gerarDias();
+
+async function sendWhats(){
+  if(!dia||!horario||servicos.length===0){
+    alert("Selecione os serviços, o dia e o horário.");
+    return;
+  }
+
+  const btn = document.getElementById("btnAgendar");
+  btn.innerText = "Validando horário...";
+  btn.disabled = true;
+
+  try {
+    // --- VERIFICAÇÃO DE SEGURANÇA FINAL ---
+    const q = query(collection(db, "agendamento"), where("dia", "==", dia), where("horario", "==", horario));
+    const snap = await getDocs(q);
+
+    if(!snap.empty){
+      alert("⚠️ Ops! Alguém acabou de reservar este horário. Por favor, escolha outro.");
+      btn.innerText = "Agendar pelo WhatsApp";
+      btn.disabled = false;
+      await filtrarHorariosOcupados(dia);
+      return;
+    }
+
+    await addDoc(collection(db, "agendamento"), {
+      cliente: nome,
+      servicos: servicos,
+      dia: dia,
+      horario: horario,
+      total: total,
+      dataCriacao: new Date()
+    });
+
+    let lista = servicos.map(s=>`- ${s.nome}`).join("\n");
+    let texto = `Olá, gostaria de agendar um horário 💈\n\nNome: ${nome}\nServiços:\n${lista}\nDia: ${dia}\nHorário: ${horario}\nTotal: R$${total}`;
+    window.location.href = "https://wa.me/5527998445517?text="+encodeURIComponent(texto);
+
+  } catch (e) {
+    alert("Erro de conexão.");
+    btn.innerText = "Agendar pelo WhatsApp";
+    btn.disabled = false;
+  }
+}
+
+document.getElementById("btnStep1").onclick = () => nextStep(2);
+document.getElementById("btnStep2").onclick = () => nextStep(3);
+document.getElementById("btnStep3").onclick = () => nextStep(4);
+document.getElementById("btnAgendar").onclick = sendWhats;
+</script>
+
+</body>
+</html>
