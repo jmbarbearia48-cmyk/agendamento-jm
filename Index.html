@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Painel Administrativo - JM Barbearia</title>
+
+<style>
+body{
+  font-family: sans-serif;
+  background:#0b0b0b;
+  color:#fff;
+  margin:0;
+  padding:20px;
+}
+.login-container,.admin-container{
+  max-width:500px;
+  margin:auto;
+  background:#1a1a1a;
+  padding:25px;
+  border-radius:15px;
+  border:1px solid #25d366;
+}
+.admin-container{max-width:800px;display:none}
+h2{color:#25d366;text-align:center}
+
+input,select{
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:8px;
+  border:none;
+  background:#333;
+  color:#fff;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  background:#25d366;
+  color:#000;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.bloco-fechar{
+  background:#333;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:25px;
+  border:1px dashed #25d366;
+}
+
+.resumo{
+  text-align:center;
+  background:#25d366;
+  color:#000;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:20px;
+  font-weight:bold;
+}
+
+/* CARD */
+.agendamento-card{
+  background:#262626;
+  padding:15px 15px 45px;
+  border-radius:10px;
+  margin-bottom:12px;
+  border-left:5px solid #25d366;
+  position:relative;
+}
+
+.agendamento-card b{
+  display:block;
+  font-size:16px;
+  color:#25d366;
+  margin-bottom:5px;
+}
+
+/* BOTÃO PEQUENO */
+.btn-liberar{
+  background:#e74c3c;
+  color:#fff;
+  border:none;
+  padding:4px 8px;
+  font-size:11px;
+  border-radius:6px;
+  cursor:pointer;
+  position:absolute;
+  bottom:10px;
+  right:10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="login-container" id="loginBox">
+  <h2>Acesso JM Barbearia</h2>
+  <input id="emailLogin" placeholder="E-mail">
+  <input type="password" id="senhaLogin" placeholder="Senha">
+  <button onclick="fazerLogin()">Entrar</button>
+</div>
+
+<!-- PAINEL -->
+<div class="admin-container" id="adminBox">
+  <h2>Painel do Barbeiro</h2>
+
+  <!-- BLOQUEIO -->
+  <div class="bloco-fechar">
+    <h3 style="color:#25d366;margin-top:0">Bloquear Horário</h3>
+
+    <select id="diaSemana">
+      <option value="">Dia da semana</option>
+      <option>DOM</option>
+      <option>SEG</option>
+      <option>TER</option>
+      <option>QUA</option>
+      <option>QUI</option>
+      <option>SEX</option>
+      <option>SAB</option>
+    </select>
+
+    <input type="number" id="diaNumero" placeholder="Dia do mês (ex: 7)">
+
+    <select id="bloqueioHora">
+      <option>17:00</option>
+      <option>18:00</option>
+      <option>19:00</option>
+      <option>20:00</option>
+      <option>21:00</option>
+    </select>
+
+    <button onclick="bloquearHorario()" style="background:#f39c12">
+      Bloquear horário
+    </button>
+  </div>
+
+  <div id="resumoFinanceiro" class="resumo">Total: R$ 0,00</div>
+  <div id="listaAgendamentos"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, getDocs,
+  query, orderBy, deleteDoc, doc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCVUmJ6w44XKuINSEyl62F7PkhoN6JAVG4",
+  authDomain: "jmbarbearia-efe18.firebaseapp.com",
+  projectId: "jmbarbearia-efe18"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* LOGIN */
+window.fazerLogin = () => {
+  if(
+    emailLogin.value==="admin@jmbarbearia.com" &&
+    senhaLogin.value==="jm@admin2024"
+  ){
+    loginBox.style.display="none";
+    adminBox.style.display="block";
+    carregarAgenda();
+  } else alert("Acesso negado");
+};
+
+/* BLOQUEAR */
+window.bloquearHorario = async () => {
+  const dia = `${diaSemana.value} ${diaNumero.value}`;
+  const hora = bloqueioHora.value;
+
+  if(!diaSemana.value || !diaNumero.value){
+    alert("Preencha o dia corretamente");
+    return;
+  }
+
+  await addDoc(collection(db,"agendamento"),{
+    cliente:"HORÁRIO BLOQUEADO",
+    dia,
+    horario:hora,
+    total:0,
+    dataCriacao:new Date()
+  });
+
+  carregarAgenda();
+};
+
+/* LISTAR */
+async function carregarAgenda(){
+  listaAgendamentos.innerHTML="";
+  let total=0;
+
+  const snap = await getDocs(
+    query(collection(db,"agendamento"),orderBy("dataCriacao","desc"))
+  );
+
+  snap.forEach(r=>{
+    const a=r.data();
+    total+=a.total||0;
+
+    listaAgendamentos.innerHTML+=`
+      <div class="agendamento-card">
+        <b>${a.cliente}</b>
+        ${a.dia} às ${a.horario}
+        <button class="btn-liberar"
+          onclick="liberarHorario('${r.id}')">
+          Abrir horário
+        </button>
+      </div>
+    `;
+  });
+
+  resumoFinanceiro.innerText=`Total: R$ ${total.toFixed(2)}`;
+}
+
+/* LIBERAR */
+window.liberarHorario = async (id)=>{
+  if(confirm("Deseja abrir este horário novamente?")){
+    await deleteDoc(doc(db,"agendamento",id));
+    carregarAgenda();
+  }
+};
+</script>
+
+</body>
+</html>
