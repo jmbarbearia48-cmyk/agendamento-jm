@@ -326,7 +326,6 @@ const diasSemana=["DOM","SEG","TER","QUA","QUI","SEX","SAB"];
 
 function gerarDias(){
   diasContainer.innerHTML="";
-  // --- CORREÇÃO DE FUSO HORÁRIO (Sempre Brasília UTC-3) ---
   let agora = new Date();
   let utc = agora.getTime() + (agora.getTimezoneOffset() * 60000);
   let data = new Date(utc + (3600000 * -3));
@@ -337,12 +336,18 @@ function gerarDias(){
       const card = document.createElement("div");
       card.className = "dia-card";
       const numDia = data.getDate();
+      const numMes = data.getMonth() + 1;
+      const numAno = data.getFullYear();
       const nomeDia = diasSemana[d];
+      
       card.innerHTML = `<strong>${nomeDia}</strong><span>${numDia}</span>`;
+      
+      const dataStringCompleta = `${nomeDia} ${numDia}/${numMes}/${numAno}`;
+      
       card.onclick = async () => {
         document.querySelectorAll(".dia-card").forEach(c=>c.classList.remove("active"));
         card.classList.add("active");
-        dia = `${nomeDia} ${numDia}`;
+        dia = dataStringCompleta; 
         await filtrarHorariosOcupados(dia);
       };
       diasContainer.appendChild(card);
@@ -363,7 +368,6 @@ async function sendWhats(){
   btn.disabled = true;
 
   try {
-    // --- VERIFICAÇÃO DE SEGURANÇA FINAL ---
     const q = query(collection(db, "agendamento"), where("dia", "==", dia), where("horario", "==", horario));
     const snap = await getDocs(q);
 
@@ -385,7 +389,7 @@ async function sendWhats(){
     });
 
     let lista = servicos.map(s=>`- ${s.nome}`).join("\n");
-    let texto = `Olá, gostaria de agendar um horário 💈\n\nNome: ${nome}\nServiços:\n${lista}\nDia: ${dia}\nHorário: ${horario}\nTotal: R$${total}`;
+    let texto = `Olá, gostaria de agendar um horário 💈\n\nNome: ${nome}\nServiços:\n${lista}\nData: ${dia}\nHorário: ${horario}\nTotal: R$${total}`;
     window.location.href = "https://wa.me/5527998445517?text="+encodeURIComponent(texto);
 
   } catch (e) {
@@ -403,3 +407,4 @@ document.getElementById("btnAgendar").onclick = sendWhats;
 
 </body>
 </html>
+
