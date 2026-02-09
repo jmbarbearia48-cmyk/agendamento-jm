@@ -389,7 +389,7 @@ async function sendWhats(){
     });
 
     let lista = servicos.map(s=>`- ${s.nome}`).join("\n");
-    let texto = `Olá, gostaria de agendar um horário 💈\n\nNome: ${nome}\nServiços:\n${lista}\nData: ${dia}\nHorário: ${horario}\nTotal: R$${total}`;
+    let texto = `Horário agendado ✅️\n\nNome: ${nome}\nServiços:\n${lista}\nData: ${dia}\nHorário: ${horario}\nTotal: R$${total}`;
     window.location.href = "https://wa.me/5527998445517?text="+encodeURIComponent(texto);
 
   } catch (e) {
@@ -407,4 +407,3 @@ document.getElementById("btnAgendar").onclick = sendWhats;
 
 </body>
 </html>
-
