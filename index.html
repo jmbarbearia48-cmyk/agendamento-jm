@@ -4,179 +4,475 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>JM Barbearia - Agendamento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#0b0b0b;
-  color:#fff;
-}
-header{
-  padding:20px;
-  text-align:center;
-  background:#000;
-}
-header h1{color:#25d366;margin:0}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-.container{
-  padding:20px;
-  max-width:900px;
-  margin:auto;
+body {
+  font-family: 'Inter', Arial, sans-serif;
+  background: #0a0a0a;
+  color: #f5f5f5;
+  min-height: 100vh;
 }
 
-.step{display:none; animation:fadeUp .35s ease}
-.step.active{display:block}
-
-@keyframes fadeUp{
-  from{opacity:0; transform:translateY(20px)}
-  to{opacity:1; transform:translateY(0)}
+/* ── HEADER ── */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #000;
+  border-bottom: 2px solid #2e7d32;
+  padding: 16px 20px 12px;
+  text-align: center;
 }
 
-h2{margin:10px 0 15px}
-
-input{
-  width:100%;
-  padding:14px;
-  border-radius:10px;
-  border:none;
-  font-size:16px;
+header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 6vw, 36px);
+  color: #f5f5f5;
+  margin: 0;
+  letter-spacing: 1px;
 }
 
-.continuar{
-  margin-top:20px;
-  width:100%;
-  padding:15px;
-  border:none;
-  border-radius:12px;
-  background:#25d366;
-  color:#000;
-  font-size:16px;
-  font-weight:bold;
-  cursor:pointer;
+header p {
+  font-size: 11px;
+  color: #c9a84c;
+  margin-top: 4px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
 }
 
-.horizontal{
-  display:flex;
-  gap:16px;
-  overflow-x:auto;
-  padding:10px 0;
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  background: #000;
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid #1f1f1f;
 }
 
-/* SERVIÇOS */
-.card{
-  position:relative;
-  flex:0 0 auto;
-  width:260px;
-  height:150px;
-  background:#1e1e1e;
-  border-radius:18px;
-  padding:18px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  cursor:pointer;
-  border:2px solid #2a2a2a;
-  transition:.25s;
-}
-.card h3{margin:0;font-size:20px}
-.card span{font-size:18px;font-weight:bold;color:#25d366}
-
-.card::after{
-  content:"";
-  width:26px;
-  height:26px;
-  border:2px solid #25d366;
-  border-radius:6px;
-  position:absolute;
-  top:10px;
-  right:10px;
-  display:none;
-}
-.card::before{
-  content:"✔";
-  position:absolute;
-  top:10px;
-  right:15px;
-  font-size:18px;
-  color:#25d366;
-  display:none;
-}
-.card.active::after,
-.card.active::before{display:block}
-
-.card.active{
-  border-color:#25d366;
-  background:#242424;
-  transform:scale(1.04);
+.progress-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 380px;
+  margin: 0 auto;
 }
 
-/* DIAS */
-.dia-card{
-  flex:0 0 auto;
-  width:110px;
-  height:140px;
-  border-radius:20px;
-  background:#1a1a1a;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  cursor:pointer;
-  border:2px solid #1f1f1f;
-}
-.dia-card.active{
-  border-color:#25d366;
-  background:#000;
+.prog-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
 }
 
-/* HORÁRIOS */
-.hora-card{
-  flex:0 0 auto;
-  width:160px;
-  height:70px;
-  border-radius:22px;
-  background:#3f444c;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:20px;
-  cursor:pointer;
-}
-.hora-card.active{
-  background:#25d366;
-  color:#000;
+.prog-step .circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #222;
+  color: #555;
+  border: 1.5px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.3s ease;
 }
 
+.prog-step .label {
+  font-size: 10px;
+  color: #555;
+  white-space: nowrap;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.prog-step.done .circle {
+  background: #2e7d32;
+  border-color: #2e7d32;
+  color: #fff;
+}
+
+.prog-step.done .label { color: #2e7d32; }
+
+.prog-step.active .circle {
+  background: #4caf50;
+  border-color: #4caf50;
+  color: #fff;
+  box-shadow: 0 0 14px rgba(76, 175, 80, 0.5);
+}
+
+.prog-step.active .label {
+  color: #4caf50;
+  font-weight: 700;
+}
+
+.prog-connector {
+  flex: 1;
+  height: 2px;
+  background: #2a2a2a;
+  margin: 0 6px;
+  margin-bottom: 20px;
+  transition: background 0.3s ease;
+  max-width: 64px;
+}
+
+.prog-connector.done { background: #2e7d32; }
+
+/* ── CONTAINER ── */
+.container {
+  padding: 28px 20px 40px;
+  max-width: 600px;
+  margin: auto;
+}
+
+/* ── STEPS ── */
+.step { display: none; animation: fadeUp .35s ease; }
+.step.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── TYPOGRAPHY ── */
+h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(20px, 5vw, 26px);
+  color: #f5f5f5;
+  margin: 0 0 22px;
+  line-height: 1.35;
+}
+
+/* ── INPUT ── */
+input[type="text"] {
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1.5px solid #1f1f1f;
+  background: #111;
+  color: #f5f5f5;
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="text"]:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.12);
+}
+
+input[type="text"]::placeholder { color: #444; }
+
+/* ── BUTTONS ── */
+.continuar {
+  margin-top: 22px;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  background: #2e7d32;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  letter-spacing: 0.4px;
+}
+
+.continuar:hover {
+  background: #4caf50;
+  box-shadow: 0 4px 20px rgba(76, 175, 80, 0.28);
+}
+
+.continuar:active { transform: scale(0.98); }
+
+/* ── DIVIDER ── */
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #c9a84c44, transparent);
+  margin: 26px 0;
+}
+
+/* ── SERVICE CARDS ── */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 480px) {
+  .services-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.card {
+  position: relative;
+  background: #111;
+  border-radius: 14px;
+  padding: 16px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  border: 1.5px solid #1f1f1f;
+  transition: all 0.2s ease;
+  min-height: 108px;
+  user-select: none;
+}
+
+.card:hover {
+  background: #1a1a1a;
+  border-color: #2e7d32;
+}
+
+.card .card-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.card .card-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f5f5f5;
+  line-height: 1.3;
+}
+
+.card .card-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #4caf50;
+  margin-top: auto;
+}
+
+.card::after {
+  content: "✔";
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 12px;
+  color: #4caf50;
+  display: none;
+}
+
+.card.active::after { display: block; }
+
+.card.active {
+  border-color: #4caf50;
+  background: #1a1a1a;
+  transform: scale(1.03);
+  box-shadow: 0 0 16px rgba(76, 175, 80, 0.18);
+}
+
+/* ── TOTAL BAR ── */
+.total-bar {
+  margin-top: 18px;
+  padding: 14px 18px;
+  background: #111;
+  border-radius: 12px;
+  border: 1px solid #1f1f1f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-bar .total-label {
+  color: #aaa;
+  font-size: 14px;
+}
+
+.total-bar .total-value {
+  color: #4caf50;
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── DIA CARDS ── */
+.dias-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 380px) {
+  .dias-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.dia-card {
+  background: #111;
+  border-radius: 14px;
+  border: 1.5px solid #1f1f1f;
+  padding: 14px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  user-select: none;
+}
+
+.dia-card:hover {
+  background: #1a1a1a;
+  border-color: #2e7d32;
+}
+
+.dia-card .dia-nome {
+  font-size: 10px;
+  font-weight: 700;
+  color: #888;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.dia-card .dia-num {
+  font-size: 22px;
+  font-weight: 700;
+  color: #f5f5f5;
+  line-height: 1.1;
+}
+
+.dia-card .dia-mes {
+  font-size: 10px;
+  color: #555;
+  text-transform: lowercase;
+}
+
+.dia-card.active {
+  border-color: #4caf50;
+  background: #1a1a1a;
+  box-shadow: 0 0 14px rgba(76, 175, 80, 0.18);
+}
+
+.dia-card.active .dia-nome { color: #4caf50; }
+.dia-card.active .dia-num  { color: #4caf50; }
+.dia-card.active .dia-mes  { color: #66bb6a; }
+
+/* ── HORA CARDS ── */
+.horas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+@media (min-width: 400px) {
+  .horas-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.hora-card {
+  background: #111;
+  border-radius: 12px;
+  border: 1.5px solid #1f1f1f;
+  padding: 14px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #f5f5f5;
+  user-select: none;
+}
+
+.hora-card:hover:not(.occupied) {
+  background: #1a1a1a;
+  border-color: #2e7d32;
+}
+
+.hora-card.active {
+  background: #2e7d32;
+  border-color: #4caf50;
+  color: #fff;
+  box-shadow: 0 0 14px rgba(76, 175, 80, 0.25);
+}
+
+.hora-card.occupied {
+  background: #0d0d0d;
+  border-color: #181818;
+  color: #2e2e2e;
+  cursor: not-allowed;
+  text-decoration: line-through;
+  text-decoration-color: #333;
+}
+
+/* ── LOADING ── */
+#loadingHoras {
+  display: none;
+  color: #4caf50;
+  font-size: 13px;
+  margin-bottom: 14px;
+  text-align: center;
+  animation: blink 1.4s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+/* ── ALL OCCUPIED MSG ── */
 #msgEsgotado {
   display: none;
-  background: #ff4d4d;
-  color: #fff;
-  padding: 15px;
+  background: #140000;
+  border: 1px solid #ff4d4d33;
+  color: #ff6b6b;
+  padding: 16px;
   border-radius: 12px;
   text-align: center;
-  font-weight: bold;
-  margin-top: 10px;
+  font-size: 14px;
+  margin-bottom: 16px;
 }
 
-.whatsapp{
-  margin-top:25px;
-  width:100%;
-  padding:18px;
-  border:none;
-  border-radius:14px;
-  background:#25d366;
-  color:#000;
-  font-size:17px;
-  font-weight:bold;
-  cursor:pointer;
+/* ── WHATSAPP BUTTON ── */
+.whatsapp {
+  margin-top: 22px;
+  width: 100%;
+  padding: 18px;
+  border: none;
+  border-radius: 14px;
+  background: #2e7d32;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  letter-spacing: 0.4px;
 }
+
+.whatsapp:hover:not(:disabled) {
+  background: #4caf50;
+  box-shadow: 0 4px 22px rgba(76, 175, 80, 0.32);
+}
+
+.whatsapp:active:not(:disabled) { transform: scale(0.98); }
 
 .whatsapp:disabled {
-  opacity: 0.6;
+  opacity: 0.35;
   cursor: not-allowed;
+  background: #181818;
+  color: #444;
+}
+
+/* ── FOOTER ── */
+footer {
+  text-align: center;
+  padding: 22px 20px;
+  color: #2e2e2e;
+  font-size: 12px;
+  border-top: 1px solid #161616;
+  margin-top: 10px;
 }
 </style>
 </head>
@@ -184,55 +480,115 @@ input{
 <body>
 
 <header>
-  <h1>JM Barbearia</h1>
+  <h1>✂️ JM Barbearia</h1>
+  <p>Agende seu horário</p>
 </header>
+
+<!-- PROGRESS -->
+<div class="progress-bar">
+  <div class="progress-steps">
+    <div class="prog-step active" id="prog1">
+      <div class="circle">1</div>
+      <div class="label">Nome</div>
+    </div>
+    <div class="prog-connector" id="conn1"></div>
+    <div class="prog-step" id="prog2">
+      <div class="circle">2</div>
+      <div class="label">Serviço</div>
+    </div>
+    <div class="prog-connector" id="conn2"></div>
+    <div class="prog-step" id="prog3">
+      <div class="circle">3</div>
+      <div class="label">Dia</div>
+    </div>
+    <div class="prog-connector" id="conn3"></div>
+    <div class="prog-step" id="prog4">
+      <div class="circle">4</div>
+      <div class="label">Horário</div>
+    </div>
+  </div>
+</div>
 
 <div class="container">
 
-<div class="step active" id="step1">
-  <h2>Olá, sou o atendente virtual da JM Barbearia, qual seu nome e sobrenome?</h2>
-  <input id="nome" placeholder="Nome e sobrenome" />
-  <button class="continuar" id="btnStep1">Continuar</button>
-</div>
-
-<div class="step" id="step2">
-  <h2 id="tituloServicos">Escolha os serviços</h2>
-  <div class="horizontal">
-    <div class="card" data-service="Corte" data-price="25"><h3>Corte</h3><span>R$25</span></div>
-    <div class="card" data-service="Corte Social" data-price="20"><h3>Corte Social</h3><span>R$20</span></div>
-    <div class="card" data-service="Corte + Cavanhaque" data-price="30"><h3>Corte + Cavanhaque</h3><span>R$30</span></div>
-    <div class="card" data-service="Corte + Barba" data-price="40"><h3>Corte + Barba</h3><span>R$40</span></div>
-    <div class="card" data-service="Corte + Pigmentação" data-price="45"><h3>Corte + Pigmentação</h3><span>R$45</span></div>
-    <div class="card" data-service="Barba" data-price="15"><h3>Barba</h3><span>R$15</span></div>
-    <div class="card" data-service="Sobrancelha" data-price="5"><h3>Sobrancelha</h3><span>R$5</span></div>
-    <div class="card" data-service="Pezinho" data-price="5"><h3>Pezinho</h3><span>R$5</span></div>
-  </div>
-  <button class="continuar" id="btnStep2">Continuar</button>
-</div>
-
-<div class="step" id="step3">
-  <h2>Escolha o dia</h2>
-  <div class="horizontal" id="dias"></div>
-  <button class="continuar" id="btnStep3">Continuar</button>
-</div>
-
-<div class="step" id="step4">
-  <h2>Escolha o horário</h2>
-  <div id="loadingHoras" style="display:none; color:#25d366; margin-bottom:10px;">Verificando horários disponíveis...</div>
-  <div id="msgEsgotado">⚠️ Ops! Todos os horários para este dia já foram marcados. Por favor, escolha outro dia.</div>
-
-  <div class="horizontal" id="containerHoras">
-    <div class="hora-card" data-time="17:00">17:00</div>
-    <div class="hora-card" data-time="18:00">18:00</div>
-    <div class="hora-card" data-time="19:00">19:00</div>
-    <div class="hora-card" data-time="20:00">20:00</div>
-    <div class="hora-card" data-time="21:00">21:00</div>
+  <!-- STEP 1 — NOME -->
+  <div class="step active" id="step1">
+    <h2>Olá! Qual é o seu nome?</h2>
+    <input type="text" id="nome" placeholder="Nome e sobrenome" />
+    <button class="continuar" id="btnStep1">Continuar →</button>
   </div>
 
-  <button class="whatsapp" id="btnAgendar">Agendar pelo WhatsApp</button>
-</div>
+  <!-- STEP 2 — SERVIÇOS -->
+  <div class="step" id="step2">
+    <h2 id="tituloServicos">Escolha seus serviços</h2>
+    <div class="services-grid">
+      <div class="card" data-service="Corte" data-price="25">
+        <div class="card-icon">✂️</div>
+        <div class="card-name">Corte</div>
+        <div class="card-price">R$25</div>
+      </div>
+      <div class="card" data-service="Corte Social" data-price="20">
+        <div class="card-icon">💈</div>
+        <div class="card-name">Corte Social</div>
+        <div class="card-price">R$20</div>
+      </div>
+      <div class="card" data-service="Corte + Cavanhaque" data-price="30">
+        <div class="card-icon">✂️</div>
+        <div class="card-name">Corte + Cavanhaque</div>
+        <div class="card-price">R$30</div>
+      </div>
+      <div class="card" data-service="Corte + Barba" data-price="40">
+        <div class="card-icon">🪒</div>
+        <div class="card-name">Corte + Barba</div>
+        <div class="card-price">R$40</div>
+      </div>
+      <div class="card" data-service="Corte + Pigmentação" data-price="45">
+        <div class="card-icon">🎨</div>
+        <div class="card-name">Corte + Pigmentação</div>
+        <div class="card-price">R$45</div>
+      </div>
+      <div class="card" data-service="Barba" data-price="15">
+        <div class="card-icon">🪒</div>
+        <div class="card-name">Barba</div>
+        <div class="card-price">R$15</div>
+      </div>
+      <div class="card" data-service="Sobrancelha" data-price="5">
+        <div class="card-icon">👁️</div>
+        <div class="card-name">Sobrancelha</div>
+        <div class="card-price">R$5</div>
+      </div>
+      <div class="card" data-service="Pezinho" data-price="5">
+        <div class="card-icon">🦶</div>
+        <div class="card-name">Pezinho</div>
+        <div class="card-price">R$5</div>
+      </div>
+    </div>
+    <div class="total-bar">
+      <span class="total-label">Total selecionado</span>
+      <span class="total-value" id="totalValor">R$0</span>
+    </div>
+    <button class="continuar" id="btnStep2">Continuar →</button>
+  </div>
+
+  <!-- STEP 3 — DIA -->
+  <div class="step" id="step3">
+    <h2>Escolha o melhor dia</h2>
+    <div class="dias-grid" id="dias"></div>
+    <button class="continuar" id="btnStep3">Continuar →</button>
+  </div>
+
+  <!-- STEP 4 — HORÁRIO -->
+  <div class="step" id="step4">
+    <h2>Qual horário funciona pra você?</h2>
+    <div id="loadingHoras">⏳ Verificando horários disponíveis...</div>
+    <div id="msgEsgotado">⚠️ Todos os horários para este dia já foram marcados. Por favor, escolha outro dia.</div>
+    <div class="horas-grid" id="containerHoras"></div>
+    <button class="whatsapp" id="btnAgendar" disabled>📱 Agendar pelo WhatsApp</button>
+  </div>
 
 </div>
+
+<footer>JM Barbearia © 2025</footer>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -248,154 +604,201 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db  = getFirestore(app);
 
-let nome="", servicos=[], total=0, dia="", horario="";
+let nome = "", servicos = [], total = 0, dia = "", horario = "";
 
-async function filtrarHorariosOcupados(diaEscolhido) {
-  const loader = document.getElementById("loadingHoras");
-  const msgErro = document.getElementById("msgEsgotado");
-  const containerHoras = document.getElementById("containerHoras");
-  const btnAgendar = document.getElementById("btnAgendar");
-  const cards = document.querySelectorAll(".hora-card");
-  
-  loader.style.display = "block";
-  msgErro.style.display = "none";
-  containerHoras.style.display = "flex";
-  btnAgendar.style.display = "block";
+// ── PROGRESS INDICATOR ──
+function updateProgress(step) {
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById("prog" + i);
+    el.classList.remove("active", "done");
+    if      (i < step)  el.classList.add("done");
+    else if (i === step) el.classList.add("active");
+  }
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById("conn" + i).classList.toggle("done", i < step);
+  }
+}
+
+// ── HOUR SLOTS (09:00 – 21:00, 1h interval) ──
+const HORAS = [];
+for (let h = 9; h <= 21; h++) {
+  HORAS.push(h.toString().padStart(2, "0") + ":00");
+}
+
+function renderHoras(ocupados = []) {
+  const container = document.getElementById("containerHoras");
+  container.innerHTML = "";
   horario = "";
-  
-  cards.forEach(c => {
-    c.style.display = "flex";
-    c.classList.remove("active");
+  document.getElementById("btnAgendar").disabled = true;
+
+  HORAS.forEach(h => {
+    const card = document.createElement("div");
+    card.className = "hora-card";
+    card.setAttribute("data-time", h);
+    card.textContent = h;
+
+    if (ocupados.includes(h)) {
+      card.classList.add("occupied");
+    } else {
+      card.addEventListener("click", () => {
+        document.querySelectorAll(".hora-card:not(.occupied)").forEach(c => c.classList.remove("active"));
+        card.classList.add("active");
+        horario = h;
+        document.getElementById("btnAgendar").disabled = false;
+      });
+    }
+    container.appendChild(card);
   });
+}
+
+// ── FILTER OCCUPIED SLOTS ──
+async function filtrarHorariosOcupados(diaEscolhido) {
+  const loader   = document.getElementById("loadingHoras");
+  const msgErro  = document.getElementById("msgEsgotado");
+
+  loader.style.display  = "block";
+  msgErro.style.display = "none";
+
+  renderHoras([]);
 
   try {
-    const q = query(collection(db, "agendamento"), where("dia", "==", diaEscolhido));
+    const q             = query(collection(db, "agendamento"), where("dia", "==", diaEscolhido));
     const querySnapshot = await getDocs(q);
-    
-    querySnapshot.forEach((doc) => {
-      const hOcupado = doc.data().horario;
-      const cardParaEsconder = document.querySelector(`.hora-card[data-time="${hOcupado}"]`);
-      if(cardParaEsconder) cardParaEsconder.style.display = "none";
-    });
+    const ocupados      = [];
+    querySnapshot.forEach(doc => { ocupados.push(doc.data().horario); });
 
-    let disponiveis = 0;
-    cards.forEach(c => { if(c.style.display !== "none") disponiveis++; });
+    renderHoras(ocupados);
 
-    if(disponiveis === 0) {
+    if (ocupados.length >= HORAS.length) {
       msgErro.style.display = "block";
-      containerHoras.style.display = "none";
-      btnAgendar.style.display = "none";
     }
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error(e);
+  }
+
   loader.style.display = "none";
 }
 
-window.nextStep = (n) => {
-  if(n===2){
-    nome=document.getElementById("nome").value.trim();
-    if(!nome){alert("Digite seu nome");return;}
-    document.getElementById("tituloServicos").innerText = `Olá, ${nome.split(" ")[0]}, qual serviço deseja?`;
-  }
-  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
-  document.getElementById("step"+n).classList.add("active");
-};
+// ── DAYS GENERATION (SEG–SAB, 7 dias) ──
+const diasSemana = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"];
+const meses      = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
 
-document.querySelectorAll('.card').forEach(card => {
-  card.addEventListener('click', () => {
-    card.classList.toggle('active');
-    const nomeS = card.getAttribute('data-service');
-    const preco = parseInt(card.getAttribute('data-price'));
-    const index = servicos.findIndex(s => s.nome === nomeS);
-    if(index > -1){ servicos.splice(index, 1); total-=preco; }
-    else { servicos.push({nome:nomeS,preco}); total+=preco; }
-  });
-});
+function gerarDias() {
+  const diasContainer = document.getElementById("dias");
+  diasContainer.innerHTML = "";
 
-document.querySelectorAll('.hora-card').forEach(card => {
-  card.addEventListener('click', () => {
-    document.querySelectorAll(".hora-card").forEach(c=>c.classList.remove("active"));
-    card.classList.add("active");
-    horario = card.getAttribute('data-time');
-  });
-});
-
-const diasContainer=document.getElementById("dias");
-const diasSemana=["DOM","SEG","TER","QUA","QUI","SEX","SAB"];
-
-function gerarDias(){
-  diasContainer.innerHTML="";
   let agora = new Date();
-  let utc = agora.getTime() + (agora.getTimezoneOffset() * 60000);
-  let data = new Date(utc + (3600000 * -3));
+  let utc   = agora.getTime() + (agora.getTimezoneOffset() * 60000);
+  let data  = new Date(utc + (3600000 * -3));
 
-  while(diasContainer.children.length < 5){
+  while (diasContainer.children.length < 7) {
     const d = data.getDay();
-    if(d >= 2 && d <= 5){ 
-      const card = document.createElement("div");
+    if (d >= 1 && d <= 6) {
+      const card    = document.createElement("div");
       card.className = "dia-card";
-      const numDia = data.getDate();
-      const numMes = data.getMonth() + 1;
-      const numAno = data.getFullYear();
+
+      const numDia  = data.getDate();
+      const numMes  = data.getMonth() + 1;
+      const numAno  = data.getFullYear();
       const nomeDia = diasSemana[d];
-      
-      card.innerHTML = `<strong>${nomeDia}</strong><span>${numDia}</span>`;
-      
+      const nomeMes = meses[data.getMonth()];
+
+      card.innerHTML = `
+        <div class="dia-nome">${nomeDia}</div>
+        <div class="dia-num">${numDia}</div>
+        <div class="dia-mes">${nomeMes}</div>
+      `;
+
       const dataStringCompleta = `${nomeDia} ${numDia}/${numMes}/${numAno}`;
-      
+
       card.onclick = async () => {
-        document.querySelectorAll(".dia-card").forEach(c=>c.classList.remove("active"));
+        document.querySelectorAll(".dia-card").forEach(c => c.classList.remove("active"));
         card.classList.add("active");
-        dia = dataStringCompleta; 
+        dia = dataStringCompleta;
         await filtrarHorariosOcupados(dia);
       };
+
       diasContainer.appendChild(card);
     }
-    data.setDate(data.getDate()+1);
+    data.setDate(data.getDate() + 1);
   }
 }
 gerarDias();
 
-async function sendWhats(){
-  if(!dia||!horario||servicos.length===0){
+// ── SERVICES SELECTION ──
+document.querySelectorAll(".card").forEach(card => {
+  card.addEventListener("click", () => {
+    card.classList.toggle("active");
+    const nomeS = card.getAttribute("data-service");
+    const preco = parseInt(card.getAttribute("data-price"));
+    const index = servicos.findIndex(s => s.nome === nomeS);
+    if (index > -1) { servicos.splice(index, 1); total -= preco; }
+    else            { servicos.push({ nome: nomeS, preco }); total += preco; }
+    document.getElementById("totalValor").textContent = "R$" + total;
+  });
+});
+
+// ── NAVIGATION ──
+window.nextStep = (n) => {
+  if (n === 2) {
+    nome = document.getElementById("nome").value.trim();
+    if (!nome) { alert("Digite seu nome"); return; }
+    document.getElementById("tituloServicos").innerText =
+      `Olá, ${nome.split(" ")[0]}! Escolha seus serviços`;
+  }
+  if (n === 3 && servicos.length === 0) {
+    alert("Selecione ao menos um serviço"); return;
+  }
+  if (n === 4 && !dia) {
+    alert("Selecione um dia"); return;
+  }
+  document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+  document.getElementById("step" + n).classList.add("active");
+  updateProgress(n);
+};
+
+// ── SEND WHATSAPP ──
+async function sendWhats() {
+  if (!dia || !horario || servicos.length === 0) {
     alert("Selecione os serviços, o dia e o horário.");
     return;
   }
 
   const btn = document.getElementById("btnAgendar");
-  btn.innerText = "Validando horário...";
-  btn.disabled = true;
+  btn.textContent = "⏳ Validando horário...";
+  btn.disabled    = true;
 
   try {
-    const q = query(collection(db, "agendamento"), where("dia", "==", dia), where("horario", "==", horario));
+    const q    = query(collection(db, "agendamento"), where("dia", "==", dia), where("horario", "==", horario));
     const snap = await getDocs(q);
 
-    if(!snap.empty){
+    if (!snap.empty) {
       alert("⚠️ Ops! Alguém acabou de reservar este horário. Por favor, escolha outro.");
-      btn.innerText = "Agendar pelo WhatsApp";
-      btn.disabled = false;
+      btn.textContent = "📱 Agendar pelo WhatsApp";
+      btn.disabled    = false;
       await filtrarHorariosOcupados(dia);
       return;
     }
 
     await addDoc(collection(db, "agendamento"), {
-      cliente: nome,
-      servicos: servicos,
-      dia: dia,
-      horario: horario,
-      total: total,
+      cliente:     nome,
+      servicos:    servicos,
+      dia:         dia,
+      horario:     horario,
+      total:       total,
       dataCriacao: new Date()
     });
 
-    let lista = servicos.map(s=>`- ${s.nome}`).join("\n");
-    let texto = `Horário agendado ✅️\n\nNome: ${nome}\nServiços:\n${lista}\nData: ${dia}\nHorário: ${horario}\nTotal: R$${total}`;
-    window.location.href = "https://wa.me/5527998445517?text="+encodeURIComponent(texto);
+    const lista = servicos.map(s => `- ${s.nome}`).join("\n");
+    const texto = `Horário agendado ✅️\n\nNome: ${nome}\nServiços:\n${lista}\nData: ${dia}\nHorário: ${horario}\nTotal: R$${total}`;
+    window.location.href = "https://wa.me/5527998445517?text=" + encodeURIComponent(texto);
 
   } catch (e) {
     alert("Erro de conexão.");
-    btn.innerText = "Agendar pelo WhatsApp";
-    btn.disabled = false;
+    btn.textContent = "📱 Agendar pelo WhatsApp";
+    btn.disabled    = false;
   }
 }
 
