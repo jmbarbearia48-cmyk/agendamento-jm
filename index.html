@@ -406,6 +406,35 @@ input[type="text"]::placeholder { color: #444; }
   text-decoration-color: #333;
 }
 
+/* ── VAGAS DISPONÍVEIS ── */
+#vagasInfo {
+  display: none;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  letter-spacing: 0.3px;
+}
+#vagasInfo.verde   { color: #4caf50; }
+#vagasInfo.amarelo { color: #f59e0b; }
+#vagasInfo.vermelho{ color: #ef4444; }
+
+/* ── DIA FECHADO (domingo) ── */
+.dia-card.fechado {
+  background: #0f0f0f;
+  border-color: #1a1a1a;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.dia-card.fechado .dia-nome { color: #444; }
+.dia-card.fechado .dia-num  { color: #444; }
+.dia-card.fechado .dia-fechado-label {
+  font-size: 9px;
+  color: #7f1d1d;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
 /* ── LOADING ── */
 #loadingHoras {
   display: none;
@@ -857,6 +886,7 @@ footer a:hover { color: #888; }
     <h2>Qual horário funciona pra você?</h2>
     <div id="loadingHoras">⏳ Verificando horários disponíveis...</div>
     <div id="msgEsgotado">⚠️ Todos os horários para este dia já foram marcados. Por favor, escolha outro dia.</div>
+    <div id="vagasInfo"></div>
     <div class="horas-grid" id="containerHoras"></div>
     <button class="whatsapp" id="btnAgendar" disabled>📱 Agendar pelo WhatsApp</button>
 
@@ -1056,7 +1086,14 @@ async function filtrarHorariosOcupados(diaEscolhido) {
 
     renderHoras(ocupados);
 
-    if (ocupados.length >= HORAS.length) {
+    const disponiveis = HORAS.length - ocupados.length;
+    const vagasEl = document.getElementById("vagasInfo");
+    if (disponiveis > 0) {
+      vagasEl.textContent = disponiveis + " horário" + (disponiveis !== 1 ? "s" : "") + " disponível" + (disponiveis !== 1 ? "s" : "") + " neste dia";
+      vagasEl.className = disponiveis >= 5 ? "verde" : disponiveis >= 2 ? "amarelo" : "vermelho";
+      vagasEl.style.display = "block";
+    } else {
+      vagasEl.style.display = "none";
       msgErro.style.display = "block";
     }
   } catch (e) {
@@ -1080,31 +1117,36 @@ function gerarDias() {
 
   while (diasContainer.children.length < 7) {
     const d = data.getDay();
-    if (d >= 1 && d <= 6) {
-      const card    = document.createElement("div");
+    const card    = document.createElement("div");
+    const numDia  = data.getDate();
+    const numMes  = data.getMonth() + 1;
+    const numAno  = data.getFullYear();
+    const nomeDia = diasSemana[d];
+    const nomeMes = meses[data.getMonth()];
+
+    if (d === 0) {
+      card.className = "dia-card fechado";
+      card.innerHTML = `
+        <div class="dia-nome">${nomeDia}</div>
+        <div class="dia-num">${numDia}</div>
+        <div class="dia-mes">${nomeMes}</div>
+        <div class="dia-fechado-label">Fechado</div>
+      `;
+      diasContainer.appendChild(card);
+    } else {
       card.className = "dia-card";
-
-      const numDia  = data.getDate();
-      const numMes  = data.getMonth() + 1;
-      const numAno  = data.getFullYear();
-      const nomeDia = diasSemana[d];
-      const nomeMes = meses[data.getMonth()];
-
       card.innerHTML = `
         <div class="dia-nome">${nomeDia}</div>
         <div class="dia-num">${numDia}</div>
         <div class="dia-mes">${nomeMes}</div>
       `;
-
       const dataStringCompleta = `${nomeDia} ${numDia}/${numMes}/${numAno}`;
-
       card.onclick = async () => {
-        document.querySelectorAll(".dia-card").forEach(c => c.classList.remove("active"));
+        document.querySelectorAll(".dia-card:not(.fechado)").forEach(c => c.classList.remove("active"));
         card.classList.add("active");
         dia = dataStringCompleta;
         await filtrarHorariosOcupados(dia);
       };
-
       diasContainer.appendChild(card);
     }
     data.setDate(data.getDate() + 1);
@@ -1164,6 +1206,23 @@ document.getElementById("btnVoltarResumo").onclick = () => {
   document.getElementById("btnAgendar").style.display      = "block";
 };
 
+// ── COOLDOWN BOTÃO CONFIRMAR ──
+function cooldownConfirmar(btn, textoFinal) {
+  btn.disabled = true;
+  let seg = 3;
+  btn.textContent = "Aguarde " + seg + "s...";
+  const iv = setInterval(() => {
+    seg--;
+    if (seg <= 0) {
+      clearInterval(iv);
+      btn.textContent = textoFinal;
+      btn.disabled    = false;
+    } else {
+      btn.textContent = "Aguarde " + seg + "s...";
+    }
+  }, 1000);
+}
+
 // ── SEND WHATSAPP ──
 async function sendWhats() {
   if (!dia || !horario || servicos.length === 0) {
@@ -1176,13 +1235,21 @@ async function sendWhats() {
   btnConfirmar.disabled    = true;
 
   try {
+    // Anti-spam: mesmo cliente no mesmo dia
+    const qSpam   = query(collection(db, "agendamento"), where("cliente", "==", nome), where("dia", "==", dia));
+    const snapSpam = await getDocs(qSpam);
+    if (!snapSpam.empty) {
+      alert("Você já possui um agendamento para este dia.");
+      cooldownConfirmar(btnConfirmar, "Confirmar e ir ao WhatsApp ✅");
+      return;
+    }
+
     const q    = query(collection(db, "agendamento"), where("dia", "==", dia), where("horario", "==", horario));
     const snap = await getDocs(q);
 
     if (!snap.empty) {
       alert("⚠️ Ops! Alguém acabou de reservar este horário. Por favor, escolha outro.");
-      btnConfirmar.textContent = "Confirmar e ir ao WhatsApp ✅";
-      btnConfirmar.disabled    = false;
+      cooldownConfirmar(btnConfirmar, "Confirmar e ir ao WhatsApp ✅");
       document.getElementById("resumoCard").style.display     = "none";
       document.getElementById("containerHoras").style.display = "grid";
       document.getElementById("btnAgendar").style.display     = "block";
@@ -1191,12 +1258,15 @@ async function sendWhats() {
       return;
     }
 
+    const ip_hash = btoa(navigator.userAgent + dia).slice(0, 16);
+
     await addDoc(collection(db, "agendamento"), {
       cliente:     nome,
       servicos:    servicos,
       dia:         dia,
       horario:     horario,
       total:       total,
+      ip_hash:     ip_hash,
       dataCriacao: new Date()
     });
 
