@@ -454,6 +454,30 @@ input[type="text"]::placeholder { color: #444; }
   text-transform: uppercase;
 }
 
+.dia-card.sabado {
+  background: #111;
+  border-color: #c9a84c33;
+  cursor: not-allowed;
+}
+.dia-card.sabado .dia-nome { color: #888; }
+.dia-card.sabado .dia-chegada-label {
+  font-size: 8px;
+  color: #c9a84c;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.aviso-sabado {
+  margin-top: 14px;
+  font-size: 12px;
+  color: #c9a84c;
+  opacity: 0.8;
+  text-align: left;
+  display: none;
+}
+
 /* ── LOADING ── */
 #loadingHoras {
   display: none;
@@ -1155,6 +1179,7 @@ footer a:hover { color: #888; }
   <div class="step" id="step3">
     <h2>Escolha o melhor dia</h2>
     <div class="dias-grid" id="dias"></div>
+    <div class="aviso-sabado" id="avisoSabado">🪒 Sábados: atendimento presencial por ordem de chegada até 16h</div>
     <button class="continuar" id="btnStep3">Continuar →</button>
   </div>
 
@@ -1493,8 +1518,19 @@ async function gerarDias() {
   let utc   = agora.getTime() + (agora.getTimezoneOffset() * 60000);
   let data  = new Date(utc + (3600000 * -3));
 
-  while (diasContainer.children.length < 7) {
+  let temSabado = false;
+  let daysChecked = 0;
+
+  while (diasContainer.children.length < 5 && daysChecked < 14) {
     const d = data.getDay();
+    daysChecked++;
+
+    // Pula domingo e segunda
+    if (d === 0 || d === 1) {
+      data.setDate(data.getDate() + 1);
+      continue;
+    }
+
     const card    = document.createElement("div");
     const numDia  = data.getDate();
     const numMes  = data.getMonth() + 1;
@@ -1503,22 +1539,23 @@ async function gerarDias() {
     const nomeMes = meses[data.getMonth()];
     const dataStringCompleta = `${nomeDia} ${numDia}/${numMes}/${numAno}`;
 
-    if (d === 0) {
-      card.className = "dia-card fechado";
-      card.innerHTML = `
-        <div class="dia-nome">${nomeDia}</div>
-        <div class="dia-num">${numDia}</div>
-        <div class="dia-mes">${nomeMes}</div>
-        <div class="dia-fechado-label">Fechado</div>
-      `;
-      diasContainer.appendChild(card);
-    } else if (folgasMap[dataStringCompleta]) {
+    if (folgasMap[dataStringCompleta]) {
       card.className = "dia-card fechado";
       card.innerHTML = `
         <div class="dia-nome">${nomeDia}</div>
         <div class="dia-num">${numDia}</div>
         <div class="dia-mes">${nomeMes}</div>
         <div class="dia-fechado-label">${folgasMap[dataStringCompleta]}</div>
+      `;
+      diasContainer.appendChild(card);
+    } else if (d === 6) {
+      temSabado = true;
+      card.className = "dia-card sabado";
+      card.innerHTML = `
+        <div class="dia-nome">${nomeDia}</div>
+        <div class="dia-num">${numDia}</div>
+        <div class="dia-mes">${nomeMes}</div>
+        <div class="dia-chegada-label">Por ordem<br>de chegada</div>
       `;
       diasContainer.appendChild(card);
     } else {
@@ -1529,7 +1566,7 @@ async function gerarDias() {
         <div class="dia-mes">${nomeMes}</div>
       `;
       card.onclick = async () => {
-        document.querySelectorAll(".dia-card:not(.fechado)").forEach(c => c.classList.remove("active"));
+        document.querySelectorAll(".dia-card:not(.fechado):not(.sabado)").forEach(c => c.classList.remove("active"));
         card.classList.add("active");
         dia = dataStringCompleta;
         await filtrarHorariosOcupados(dia);
@@ -1538,6 +1575,8 @@ async function gerarDias() {
     }
     data.setDate(data.getDate() + 1);
   }
+
+  document.getElementById("avisoSabado").style.display = temSabado ? "block" : "none";
 }
 gerarDias();
 
