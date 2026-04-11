@@ -465,6 +465,130 @@ input[type="text"]::placeholder { color: #444; }
   color: #444;
 }
 
+/* ── RESUMO CARD ── */
+#resumoCard {
+  display: none;
+  margin-top: 20px;
+  background: #111;
+  border: 1.5px solid #c9a84c;
+  border-radius: 16px;
+  padding: 22px 20px;
+  animation: fadeUp .3s ease;
+}
+
+.resumo-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  color: #f5f5f5;
+  margin-bottom: 16px;
+}
+
+.resumo-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid #1e1e1e;
+  font-size: 14px;
+  gap: 12px;
+}
+
+.resumo-linha:last-of-type { border-bottom: none; }
+
+.resumo-label { color: #888; flex-shrink: 0; }
+.resumo-valor { color: #f5f5f5; font-weight: 600; text-align: right; }
+.resumo-total-valor { color: #4caf50; font-size: 17px; font-weight: 700; }
+
+.resumo-btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-voltar {
+  flex: 1;
+  padding: 14px;
+  border: 1.5px solid #2a2a2a;
+  border-radius: 12px;
+  background: transparent;
+  color: #888;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-voltar:hover { border-color: #555; color: #f5f5f5; }
+
+.btn-confirmar {
+  flex: 2;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: #2e7d32;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-confirmar:hover {
+  background: #4caf50;
+  box-shadow: 0 4px 20px rgba(76, 175, 80, 0.28);
+}
+
+/* ── SUCCESS SCREEN ── */
+#telaSuccesso {
+  display: none;
+  animation: fadeUp .35s ease;
+  text-align: center;
+  padding: 30px 0 10px;
+}
+
+.sucesso-icone { font-size: 68px; display: block; margin-bottom: 18px; }
+
+.sucesso-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  color: #4caf50;
+  margin-bottom: 10px;
+}
+
+.sucesso-subtexto {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 28px;
+  line-height: 1.7;
+}
+
+.sucesso-card {
+  background: #111;
+  border: 1.5px solid #c9a84c;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.btn-novo {
+  width: 100%;
+  padding: 16px;
+  border: 1.5px solid #2e7d32;
+  border-radius: 12px;
+  background: transparent;
+  color: #4caf50;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-novo:hover { background: #2e7d32; color: #fff; }
+
 /* ── FOOTER ── */
 footer {
   text-align: center;
@@ -584,6 +708,65 @@ footer {
     <div id="msgEsgotado">⚠️ Todos os horários para este dia já foram marcados. Por favor, escolha outro dia.</div>
     <div class="horas-grid" id="containerHoras"></div>
     <button class="whatsapp" id="btnAgendar" disabled>📱 Agendar pelo WhatsApp</button>
+
+    <!-- RESUMO ANTES DE CONFIRMAR -->
+    <div id="resumoCard">
+      <div class="resumo-titulo">Confirme seu agendamento</div>
+      <div class="resumo-linha">
+        <span class="resumo-label">Nome</span>
+        <span class="resumo-valor" id="resumoNome"></span>
+      </div>
+      <div class="resumo-linha">
+        <span class="resumo-label">Serviços</span>
+        <span class="resumo-valor" id="resumoServicos"></span>
+      </div>
+      <div class="resumo-linha">
+        <span class="resumo-label">Dia</span>
+        <span class="resumo-valor" id="resumoDia"></span>
+      </div>
+      <div class="resumo-linha">
+        <span class="resumo-label">Horário</span>
+        <span class="resumo-valor" id="resumoHorario"></span>
+      </div>
+      <div class="resumo-linha">
+        <span class="resumo-label">Total</span>
+        <span class="resumo-valor resumo-total-valor" id="resumoTotal"></span>
+      </div>
+      <div class="resumo-btns">
+        <button class="btn-voltar" id="btnVoltarResumo">← Voltar e ajustar</button>
+        <button class="btn-confirmar" id="btnConfirmar">Confirmar e ir ao WhatsApp ✅</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA DE SUCESSO PÓS-AGENDAMENTO -->
+  <div id="telaSuccesso">
+    <span class="sucesso-icone">✅</span>
+    <div class="sucesso-titulo">Agendamento confirmado!</div>
+    <div class="sucesso-subtexto">Você será redirecionado ao WhatsApp<br>para finalizar.</div>
+    <div class="sucesso-card">
+      <div class="resumo-linha">
+        <span class="resumo-label">Nome</span>
+        <span class="resumo-valor" id="sucessoNome"></span>
+      </div>
+      <div class="resumo-linha">
+        <span class="resumo-label">Serviços</span>
+        <span class="resumo-valor" id="sucessoServicos"></span>
+      </div>
+      <div class="resumo-linha">
+        <span class="resumo-label">Dia</span>
+        <span class="resumo-valor" id="sucessoDia"></span>
+      </div>
+      <div class="resumo-linha">
+        <span class="resumo-label">Horário</span>
+        <span class="resumo-valor" id="sucessoHorario"></span>
+      </div>
+      <div class="resumo-linha">
+        <span class="resumo-label">Total</span>
+        <span class="resumo-valor resumo-total-valor" id="sucessoTotal"></span>
+      </div>
+    </div>
+    <button class="btn-novo" onclick="location.reload()">+ Novo agendamento</button>
   </div>
 
 </div>
@@ -759,6 +942,26 @@ window.nextStep = (n) => {
   updateProgress(n);
 };
 
+// ── MOSTRAR RESUMO (ao clicar em "Agendar pelo WhatsApp") ──
+function mostrarResumo() {
+  const nomesSvc = servicos.map(s => s.nome).join(", ");
+  document.getElementById("resumoNome").textContent    = nome;
+  document.getElementById("resumoServicos").textContent = nomesSvc;
+  document.getElementById("resumoDia").textContent     = dia;
+  document.getElementById("resumoHorario").textContent = horario;
+  document.getElementById("resumoTotal").textContent   = "R$" + total;
+
+  document.getElementById("btnAgendar").style.display  = "none";
+  document.getElementById("containerHoras").style.display = "none";
+  document.getElementById("resumoCard").style.display  = "block";
+}
+
+document.getElementById("btnVoltarResumo").onclick = () => {
+  document.getElementById("resumoCard").style.display      = "none";
+  document.getElementById("containerHoras").style.display  = "grid";
+  document.getElementById("btnAgendar").style.display      = "block";
+};
+
 // ── SEND WHATSAPP ──
 async function sendWhats() {
   if (!dia || !horario || servicos.length === 0) {
@@ -766,9 +969,9 @@ async function sendWhats() {
     return;
   }
 
-  const btn = document.getElementById("btnAgendar");
-  btn.textContent = "⏳ Validando horário...";
-  btn.disabled    = true;
+  const btnConfirmar = document.getElementById("btnConfirmar");
+  btnConfirmar.textContent = "⏳ Validando...";
+  btnConfirmar.disabled    = true;
 
   try {
     const q    = query(collection(db, "agendamento"), where("dia", "==", dia), where("horario", "==", horario));
@@ -776,8 +979,12 @@ async function sendWhats() {
 
     if (!snap.empty) {
       alert("⚠️ Ops! Alguém acabou de reservar este horário. Por favor, escolha outro.");
-      btn.textContent = "📱 Agendar pelo WhatsApp";
-      btn.disabled    = false;
+      btnConfirmar.textContent = "Confirmar e ir ao WhatsApp ✅";
+      btnConfirmar.disabled    = false;
+      document.getElementById("resumoCard").style.display     = "none";
+      document.getElementById("containerHoras").style.display = "grid";
+      document.getElementById("btnAgendar").style.display     = "block";
+      document.getElementById("btnAgendar").disabled          = true;
       await filtrarHorariosOcupados(dia);
       return;
     }
@@ -791,21 +998,38 @@ async function sendWhats() {
       dataCriacao: new Date()
     });
 
+    // Preenche tela de sucesso
+    const nomesSvc = servicos.map(s => s.nome).join(", ");
+    document.getElementById("sucessoNome").textContent     = nome;
+    document.getElementById("sucessoServicos").textContent = nomesSvc;
+    document.getElementById("sucessoDia").textContent      = dia;
+    document.getElementById("sucessoHorario").textContent  = horario;
+    document.getElementById("sucessoTotal").textContent    = "R$" + total;
+
+    // Esconde steps e progress, exibe tela de sucesso
+    document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+    document.querySelector(".progress-bar").style.display = "none";
+    document.getElementById("telaSuccesso").style.display = "block";
+
+    // Abre WhatsApp após 2.5s
     const lista = servicos.map(s => `- ${s.nome}`).join("\n");
     const texto = `Horário agendado ✅️\n\nNome: ${nome}\nServiços:\n${lista}\nData: ${dia}\nHorário: ${horario}\nTotal: R$${total}`;
-    window.location.href = "https://wa.me/5527998445517?text=" + encodeURIComponent(texto);
+    setTimeout(() => {
+      window.location.href = "https://wa.me/5527998445517?text=" + encodeURIComponent(texto);
+    }, 2500);
 
   } catch (e) {
     alert("Erro de conexão.");
-    btn.textContent = "📱 Agendar pelo WhatsApp";
-    btn.disabled    = false;
+    btnConfirmar.textContent = "Confirmar e ir ao WhatsApp ✅";
+    btnConfirmar.disabled    = false;
   }
 }
 
-document.getElementById("btnStep1").onclick = () => nextStep(2);
-document.getElementById("btnStep2").onclick = () => nextStep(3);
-document.getElementById("btnStep3").onclick = () => nextStep(4);
-document.getElementById("btnAgendar").onclick = sendWhats;
+document.getElementById("btnStep1").onclick   = () => nextStep(2);
+document.getElementById("btnStep2").onclick   = () => nextStep(3);
+document.getElementById("btnStep3").onclick   = () => nextStep(4);
+document.getElementById("btnAgendar").onclick = mostrarResumo;
+document.getElementById("btnConfirmar").onclick = sendWhats;
 </script>
 
 </body>
