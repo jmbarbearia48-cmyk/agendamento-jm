@@ -778,6 +778,188 @@ footer a {
 }
 
 footer a:hover { color: #888; }
+
+.btn-gear {
+  background: none;
+  border: none;
+  color: #252525;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 4px;
+  transition: color 0.2s;
+  vertical-align: middle;
+}
+.btn-gear:hover { color: #555; }
+
+/* ── MODAL LOGIN ADMIN ── */
+#modalAdminLogin {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+#modalAdminLogin.open { display: flex; }
+
+.admin-login-box {
+  background: #111;
+  border: 1.5px solid #2a2a2a;
+  border-radius: 18px;
+  padding: 30px 24px;
+  width: 100%;
+  max-width: 360px;
+  position: relative;
+}
+.admin-login-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  color: #f5f5f5;
+  margin-bottom: 22px;
+}
+.admin-login-err {
+  display: none;
+  font-size: 13px;
+  color: #ff6b6b;
+  background: #140000;
+  border: 1px solid #ff4d4d33;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 12px;
+  text-align: center;
+}
+
+/* ── PAINEL ADMIN ── */
+#adminPanel {
+  display: none;
+  min-height: 100vh;
+  background: #0a0a0a;
+}
+
+.admin-header {
+  background: #000;
+  border-bottom: 2px solid #2e7d32;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.admin-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  color: #f5f5f5;
+  margin: 0;
+}
+.btn-sair {
+  padding: 8px 16px;
+  border: 1.5px solid #333;
+  border-radius: 8px;
+  background: transparent;
+  color: #888;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-sair:hover { border-color: #ef4444; color: #ef4444; }
+
+.admin-tabs {
+  display: flex;
+  background: #000;
+  border-bottom: 1px solid #1f1f1f;
+  padding: 0 16px;
+  overflow-x: auto;
+}
+.admin-tab {
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  color: #555;
+  cursor: pointer;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.admin-tab:hover  { color: #aaa; }
+.admin-tab.active { color: #4caf50; border-bottom-color: #4caf50; }
+
+.admin-content { padding: 24px 20px; max-width: 700px; margin: 0 auto; }
+.admin-aba        { display: none; }
+.admin-aba.active { display: block; }
+
+.admin-date-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.admin-date-row input[type="date"] {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid #1f1f1f;
+  background: #111;
+  color: #f5f5f5;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.admin-date-row input[type="date"]:focus { border-color: #4caf50; }
+.admin-date-row input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.5); }
+
+.admin-contador {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: #111;
+  border-radius: 10px;
+  border: 1px solid #1f1f1f;
+}
+.admin-contador strong { color: #4caf50; }
+
+.agend-card {
+  background: #111;
+  border: 1.5px solid #1f1f1f;
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  animation: fadeUp .25s ease;
+}
+.agend-card-info { flex: 1; }
+.agend-hora     { font-size: 22px; font-weight: 700; color: #4caf50; line-height: 1; margin-bottom: 6px; }
+.agend-nome     { font-size: 15px; font-weight: 600; color: #f5f5f5; margin-bottom: 3px; }
+.agend-servicos { font-size: 12px; color: #888; margin-bottom: 3px; }
+.agend-total    { font-size: 13px; font-weight: 600; color: #c9a84c; }
+
+.btn-cancel-agend {
+  padding: 8px 14px;
+  border: 1.5px solid #7f1d1d;
+  border-radius: 8px;
+  background: transparent;
+  color: #fca5a5;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-cancel-agend:hover { background: #7f1d1d; }
+
+.admin-vazio   { text-align: center; color: #444; font-size: 14px; padding: 40px 0; }
+.admin-loading { text-align: center; color: #4caf50; font-size: 13px; padding: 20px 0; animation: blink 1.4s infinite; }
 </style>
 </head>
 
@@ -1003,11 +1185,65 @@ footer a:hover { color: #888; }
   </div>
 </div>
 
-<footer>JM Barbearia © 2025 &nbsp;·&nbsp; <a href="#" id="linkCancelar">Cancelar agendamento</a></footer>
+<footer>JM Barbearia © 2025 &nbsp;·&nbsp; <a href="#" id="linkCancelar">Cancelar agendamento</a> &nbsp;·&nbsp; <button class="btn-gear" id="btnAdminGear" title="Painel Admin">⚙</button></footer>
+
+<!-- MODAL LOGIN ADMIN -->
+<div id="modalAdminLogin">
+  <div class="admin-login-box">
+    <button class="modal-close" id="btnFecharLogin" style="position:absolute;top:16px;right:16px;">✕</button>
+    <h3>⚙ Acesso Admin</h3>
+    <div class="modal-field">
+      <label>E-mail</label>
+      <input type="email" id="adminEmail" placeholder="admin@email.com" />
+    </div>
+    <div class="modal-field" style="margin-top:12px;">
+      <label>Senha</label>
+      <input type="password" id="adminSenha" placeholder="••••••••" />
+    </div>
+    <button class="btn-buscar" id="btnAdminEntrar" style="margin-top:16px;">Entrar</button>
+    <div class="admin-login-err" id="adminLoginErr">E-mail ou senha incorretos.</div>
+  </div>
+</div>
+
+<!-- PAINEL ADMIN -->
+<div id="adminPanel">
+  <div class="admin-header">
+    <h2>⚙ Painel JM Barbearia</h2>
+    <button class="btn-sair" id="btnAdminSair">Sair</button>
+  </div>
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-aba="agendamentos">Agendamentos</button>
+    <button class="admin-tab" data-aba="bloqueios">Bloquear Horários</button>
+    <button class="admin-tab" data-aba="folgas">Dias de Folga</button>
+  </div>
+  <div class="admin-content">
+
+    <!-- ABA 1 — AGENDAMENTOS -->
+    <div class="admin-aba active" id="abaAgendamentos">
+      <div class="admin-date-row">
+        <input type="date" id="adminDataFiltro" />
+      </div>
+      <div class="admin-contador" id="adminContador" style="display:none;"></div>
+      <div id="adminListaAgendamentos"></div>
+    </div>
+
+    <!-- ABA 2 (placeholder) -->
+    <div class="admin-aba" id="abaBloqueios">
+      <div class="admin-vazio">Em breve: bloquear horários específicos.</div>
+    </div>
+
+    <!-- ABA 3 (placeholder) -->
+    <div class="admin-aba" id="abaFolgas">
+      <div class="admin-vazio">Em breve: cadastrar dias de folga.</div>
+    </div>
+
+  </div>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCVUmJ6w44XKuINSEyl62F7PkhoN6JAVG4",
@@ -1018,8 +1254,9 @@ const firebaseConfig = {
   appId: "1:787951187504:web:3e02b2848abd9dfdda9ff5"
 };
 
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
 
 let nome = "", servicos = [], total = 0, dia = "", horario = "";
 
@@ -1302,6 +1539,176 @@ document.getElementById("btnStep2").onclick   = () => nextStep(3);
 document.getElementById("btnStep3").onclick   = () => nextStep(4);
 document.getElementById("btnAgendar").onclick = mostrarResumo;
 document.getElementById("btnConfirmar").onclick = sendWhats;
+
+// ── PAINEL ADMIN ──
+(function() {
+  const siteContainer  = document.querySelector(".container");
+  const siteProgress   = document.querySelector(".progress-bar");
+  const siteHeader     = document.querySelector("header");
+  const siteFooter     = document.querySelector("footer");
+  const adminPanel     = document.getElementById("adminPanel");
+  const modalLogin     = document.getElementById("modalAdminLogin");
+
+  function mostrarPainel() {
+    siteContainer.style.display = "none";
+    siteProgress.style.display  = "none";
+    siteHeader.style.display    = "none";
+    siteFooter.style.display    = "none";
+    adminPanel.style.display    = "block";
+    modalLogin.classList.remove("open");
+  }
+
+  function esconderPainel() {
+    siteContainer.style.display = "";
+    siteProgress.style.display  = "";
+    siteHeader.style.display    = "";
+    siteFooter.style.display    = "";
+    adminPanel.style.display    = "none";
+  }
+
+  // Auth state
+  onAuthStateChanged(auth, user => {
+    if (user) mostrarPainel();
+    else esconderPainel();
+  });
+
+  // Abrir modal login
+  document.getElementById("btnAdminGear").onclick = () => {
+    document.getElementById("adminLoginErr").style.display = "none";
+    document.getElementById("adminEmail").value  = "";
+    document.getElementById("adminSenha").value  = "";
+    modalLogin.classList.add("open");
+  };
+  document.getElementById("btnFecharLogin").onclick = () => modalLogin.classList.remove("open");
+  modalLogin.addEventListener("click", e => { if (e.target === modalLogin) modalLogin.classList.remove("open"); });
+
+  // Login
+  document.getElementById("btnAdminEntrar").onclick = async () => {
+    const email = document.getElementById("adminEmail").value.trim();
+    const senha  = document.getElementById("adminSenha").value;
+    const errEl  = document.getElementById("adminLoginErr");
+    const btn    = document.getElementById("btnAdminEntrar");
+    errEl.style.display = "none";
+    btn.textContent = "Entrando...";
+    btn.disabled    = true;
+    try {
+      await signInWithEmailAndPassword(auth, email, senha);
+      // onAuthStateChanged cuida do resto
+    } catch {
+      errEl.style.display = "block";
+      btn.textContent = "Entrar";
+      btn.disabled    = false;
+    }
+  };
+
+  // Sair
+  document.getElementById("btnAdminSair").onclick = () => signOut(auth);
+
+  // Tabs
+  document.querySelectorAll(".admin-tab").forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".admin-aba").forEach(a => a.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById("aba" + tab.dataset.aba.charAt(0).toUpperCase() + tab.dataset.aba.slice(1)).classList.add("active");
+    };
+  });
+
+  // Converte "2026-04-08" → "TER 8/4/2026" (mesmo formato do agendamento)
+  const _nomesDia = ["DOM","SEG","TER","QUA","QUI","SEX","SAB"];
+  function dateInputToDiaStr(val) {
+    if (!val) return "";
+    const [ano, mes, d] = val.split("-").map(Number);
+    const dt = new Date(ano, mes - 1, d);
+    return `${_nomesDia[dt.getDay()]} ${dt.getDate()}/${dt.getMonth()+1}/${dt.getFullYear()}`;
+  }
+
+  // Aba 1 — buscar agendamentos por data
+  async function carregarAgendamentos(diaStr) {
+    const lista    = document.getElementById("adminListaAgendamentos");
+    const contador = document.getElementById("adminContador");
+    lista.innerHTML    = '<div class="admin-loading">⏳ Carregando...</div>';
+    contador.style.display = "none";
+
+    try {
+      const q    = query(collection(db, "agendamento"), where("dia", "==", diaStr));
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        lista.innerHTML = '<div class="admin-vazio">Nenhum agendamento para este dia.</div>';
+        return;
+      }
+
+      // Ordenar por horário
+      const docs = [];
+      snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
+      docs.sort((a, b) => a.horario.localeCompare(b.horario));
+
+      const totalGeral = docs.reduce((acc, d) => acc + (d.total || 0), 0);
+      contador.innerHTML = `<strong>${docs.length}</strong> agendamento${docs.length !== 1 ? "s" : ""} &nbsp;·&nbsp; Total: <strong>R$${totalGeral}</strong>`;
+      contador.style.display = "block";
+
+      lista.innerHTML = "";
+      docs.forEach(ag => {
+        const nomesSvc = Array.isArray(ag.servicos)
+          ? ag.servicos.map(s => s.nome).join(", ")
+          : (ag.servicos || "—");
+
+        const card = document.createElement("div");
+        card.className = "agend-card";
+        card.id = "agcard-" + ag.id;
+        card.innerHTML = `
+          <div class="agend-card-info">
+            <div class="agend-hora">${ag.horario}</div>
+            <div class="agend-nome">${ag.cliente}</div>
+            <div class="agend-servicos">${nomesSvc}</div>
+            <div class="agend-total">R$${ag.total || 0}</div>
+          </div>
+          <button class="btn-cancel-agend" data-id="${ag.id}">Cancelar</button>
+        `;
+        lista.appendChild(card);
+      });
+
+      // Cancelar individual
+      lista.querySelectorAll(".btn-cancel-agend").forEach(btn => {
+        btn.onclick = async () => {
+          if (!confirm("Cancelar este agendamento?")) return;
+          btn.textContent = "...";
+          btn.disabled    = true;
+          try {
+            await deleteDoc(doc(db, "agendamento", btn.dataset.id));
+            document.getElementById("agcard-" + btn.dataset.id)?.remove();
+            // Atualizar contador
+            const restantes = lista.querySelectorAll(".agend-card");
+            if (restantes.length === 0) {
+              lista.innerHTML = '<div class="admin-vazio">Nenhum agendamento para este dia.</div>';
+              contador.style.display = "none";
+            } else {
+              const novoTotal = Array.from(restantes).reduce((acc, c) => {
+                const t = parseInt(c.querySelector(".agend-total").textContent.replace("R$","")) || 0;
+                return acc + t;
+              }, 0);
+              contador.innerHTML = `<strong>${restantes.length}</strong> agendamento${restantes.length !== 1 ? "s" : ""} &nbsp;·&nbsp; Total: <strong>R$${novoTotal}</strong>`;
+            }
+          } catch {
+            btn.textContent = "Cancelar";
+            btn.disabled    = false;
+            alert("Erro ao cancelar.");
+          }
+        };
+      });
+
+    } catch(e) {
+      lista.innerHTML = '<div class="admin-vazio">Erro ao carregar agendamentos.</div>';
+      console.error(e);
+    }
+  }
+
+  document.getElementById("adminDataFiltro").onchange = function() {
+    const diaStr = dateInputToDiaStr(this.value);
+    if (diaStr) carregarAgendamentos(diaStr);
+  };
+})();
 
 // ── MODAL CANCELAMENTO ──
 (function() {
