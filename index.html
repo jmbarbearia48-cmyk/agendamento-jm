@@ -960,6 +960,45 @@ footer a:hover { color: #888; }
 
 .admin-vazio   { text-align: center; color: #444; font-size: 14px; padding: 40px 0; }
 .admin-loading { text-align: center; color: #4caf50; font-size: 13px; padding: 20px 0; animation: blink 1.4s infinite; }
+
+.admin-hora-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 4px;
+}
+.admin-hora-card {
+  border-radius: 12px;
+  border: 1.5px solid #1f1f1f;
+  padding: 14px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #111;
+  color: #f5f5f5;
+  gap: 4px;
+  user-select: none;
+}
+.admin-hora-card:hover:not(.com-agendamento) { background: #1a1a1a; border-color: #2e7d32; }
+.admin-hora-card.bloqueado {
+  background: #1a0000;
+  border-color: #7f1d1d;
+  color: #fca5a5;
+}
+.admin-hora-card.bloqueado:hover { background: #2a0000; }
+.admin-hora-card.com-agendamento {
+  background: #0d0d0d;
+  border-color: #1a1a1a;
+  color: #333;
+  cursor: not-allowed;
+}
+.admin-hora-card .admin-hora-sub { font-size: 10px; font-weight: 400; }
 </style>
 </head>
 
@@ -1227,9 +1266,17 @@ footer a:hover { color: #888; }
       <div id="adminListaAgendamentos"></div>
     </div>
 
-    <!-- ABA 2 (placeholder) -->
+    <!-- ABA 2 — BLOQUEAR HORÁRIOS -->
     <div class="admin-aba" id="abaBloqueios">
-      <div class="admin-vazio">Em breve: bloquear horários específicos.</div>
+      <div class="admin-date-row">
+        <input type="date" id="adminDataBloqueio" />
+      </div>
+      <div id="adminBloqueioInfo" style="font-size:12px;color:#555;margin-bottom:14px;display:none;">
+        Clique para <span style="color:#4caf50">bloquear</span> um horário livre &nbsp;·&nbsp;
+        Clique em <span style="color:#fca5a5">🔒 bloqueado</span> para desbloquear &nbsp;·&nbsp;
+        <span style="color:#333">Cinza</span> = agendamento de cliente
+      </div>
+      <div id="adminBloqueioGrid" class="admin-hora-grid"></div>
     </div>
 
     <!-- ABA 3 (placeholder) -->
@@ -1316,10 +1363,14 @@ async function filtrarHorariosOcupados(diaEscolhido) {
   renderHoras([]);
 
   try {
-    const q             = query(collection(db, "agendamento"), where("dia", "==", diaEscolhido));
-    const querySnapshot = await getDocs(q);
-    const ocupados      = [];
-    querySnapshot.forEach(doc => { ocupados.push(doc.data().horario); });
+    const [snapAgend, snapBloq] = await Promise.all([
+      getDocs(query(collection(db, "agendamento"), where("dia", "==", diaEscolhido))),
+      getDocs(query(collection(db, "bloqueios"),   where("dia", "==", diaEscolhido)))
+    ]);
+
+    const ocupados = [];
+    snapAgend.forEach(d => { ocupados.push(d.data().horario); });
+    snapBloq.forEach(d  => { if (!ocupados.includes(d.data().horario)) ocupados.push(d.data().horario); });
 
     renderHoras(ocupados);
 
@@ -1707,6 +1758,111 @@ document.getElementById("btnConfirmar").onclick = sendWhats;
   document.getElementById("adminDataFiltro").onchange = function() {
     const diaStr = dateInputToDiaStr(this.value);
     if (diaStr) carregarAgendamentos(diaStr);
+  };
+
+  // ── ABA 2: BLOQUEAR HORÁRIOS ──
+  async function carregarBloqueios(diaStr) {
+    const grid = document.getElementById("adminBloqueioGrid");
+    const info = document.getElementById("adminBloqueioInfo");
+    grid.innerHTML = '<div class="admin-loading" style="grid-column:1/-1">⏳ Carregando...</div>';
+    info.style.display = "none";
+
+    try {
+      const [snapAgend, snapBloq] = await Promise.all([
+        getDocs(query(collection(db, "agendamento"), where("dia", "==", diaStr))),
+        getDocs(query(collection(db, "bloqueios"),   where("dia", "==", diaStr)))
+      ]);
+
+      const comAgendamento = new Set();
+      snapAgend.forEach(d => comAgendamento.add(d.data().horario));
+
+      // mapa horario → docId para poder deletar
+      const bloqueadosMap = {};
+      snapBloq.forEach(d => { bloqueadosMap[d.data().horario] = d.id; });
+
+      grid.innerHTML = "";
+      info.style.display = "block";
+
+      HORAS.forEach(h => {
+        const card = document.createElement("div");
+        card.className = "admin-hora-card";
+        card.dataset.hora = h;
+
+        if (comAgendamento.has(h)) {
+          card.classList.add("com-agendamento");
+          card.innerHTML = `<span>${h}</span><span class="admin-hora-sub">agendado</span>`;
+        } else if (bloqueadosMap[h]) {
+          card.classList.add("bloqueado");
+          card.innerHTML = `<span>🔒</span><span>${h}</span>`;
+          card.onclick = async () => {
+            card.style.opacity = "0.4";
+            card.style.pointerEvents = "none";
+            try {
+              await deleteDoc(doc(db, "bloqueios", bloqueadosMap[h]));
+              delete bloqueadosMap[h];
+              card.classList.remove("bloqueado");
+              card.innerHTML = `<span>${h}</span>`;
+              card.style.opacity = "";
+              card.style.pointerEvents = "";
+              card.onclick = () => bloquearHora(card, diaStr, h, bloqueadosMap);
+            } catch {
+              card.style.opacity = "";
+              card.style.pointerEvents = "";
+              alert("Erro ao desbloquear.");
+            }
+          };
+        } else {
+          card.innerHTML = `<span>${h}</span>`;
+          card.onclick = () => bloquearHora(card, diaStr, h, bloqueadosMap);
+        }
+
+        grid.appendChild(card);
+      });
+    } catch(e) {
+      grid.innerHTML = '<div class="admin-vazio" style="grid-column:1/-1">Erro ao carregar.</div>';
+      console.error(e);
+    }
+  }
+
+  async function bloquearHora(card, diaStr, h, bloqueadosMap) {
+    card.style.opacity = "0.4";
+    card.style.pointerEvents = "none";
+    try {
+      const novoDoc = await addDoc(collection(db, "bloqueios"), {
+        dia: diaStr, horario: h, motivo: "bloqueado_admin"
+      });
+      bloqueadosMap[h] = novoDoc.id;
+      card.classList.add("bloqueado");
+      card.innerHTML = `<span>🔒</span><span>${h}</span>`;
+      card.style.opacity = "";
+      card.style.pointerEvents = "";
+      card.onclick = async () => {
+        card.style.opacity = "0.4";
+        card.style.pointerEvents = "none";
+        try {
+          await deleteDoc(doc(db, "bloqueios", bloqueadosMap[h]));
+          delete bloqueadosMap[h];
+          card.classList.remove("bloqueado");
+          card.innerHTML = `<span>${h}</span>`;
+          card.style.opacity = "";
+          card.style.pointerEvents = "";
+          card.onclick = () => bloquearHora(card, diaStr, h, bloqueadosMap);
+        } catch {
+          card.style.opacity = "";
+          card.style.pointerEvents = "";
+          alert("Erro ao desbloquear.");
+        }
+      };
+    } catch {
+      card.style.opacity = "";
+      card.style.pointerEvents = "";
+      alert("Erro ao bloquear.");
+    }
+  }
+
+  document.getElementById("adminDataBloqueio").onchange = function() {
+    const diaStr = dateInputToDiaStr(this.value);
+    if (diaStr) carregarBloqueios(diaStr);
   };
 })();
 
