@@ -128,15 +128,34 @@ header p {
   padding: 28px 20px 40px;
   max-width: 600px;
   margin: auto;
+  position: relative;
+  overflow: hidden;
 }
 
 /* ── STEPS ── */
-.step { display: none; animation: fadeUp .35s ease; }
+.step        { display: none; }
 .step.active { display: block; }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+.step.entering-fwd  { animation: stepSlideInRight .35s ease forwards; }
+.step.entering-back { animation: stepSlideInLeft  .35s ease forwards; }
+.step.exiting {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  pointer-events: none;
+  animation: stepFadeOut .35s ease forwards;
+}
+
+@keyframes stepSlideInRight {
+  from { opacity: 0; transform: translateX(50px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes stepSlideInLeft {
+  from { opacity: 0; transform: translateX(-50px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes stepFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
 
 /* ── TYPOGRAPHY ── */
@@ -961,6 +980,43 @@ footer a:hover { color: #888; }
 .admin-vazio   { text-align: center; color: #444; font-size: 14px; padding: 40px 0; }
 .admin-loading { text-align: center; color: #4caf50; font-size: 13px; padding: 20px 0; animation: blink 1.4s infinite; }
 
+.folga-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.folga-form input {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid #1f1f1f;
+  background: #111;
+  color: #f5f5f5;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.folga-form input:focus { border-color: #4caf50; }
+.folga-form input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.5); }
+
+.folga-item {
+  background: #111;
+  border: 1.5px solid #1f1f1f;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  animation: fadeUp .25s ease;
+}
+.folga-item-info { flex: 1; }
+.folga-data   { font-size: 14px; font-weight: 600; color: #f5f5f5; }
+.folga-motivo { font-size: 12px; color: #888; margin-top: 2px; }
+
 .admin-hora-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1279,9 +1335,14 @@ footer a:hover { color: #888; }
       <div id="adminBloqueioGrid" class="admin-hora-grid"></div>
     </div>
 
-    <!-- ABA 3 (placeholder) -->
+    <!-- ABA 3 — DIAS DE FOLGA -->
     <div class="admin-aba" id="abaFolgas">
-      <div class="admin-vazio">Em breve: cadastrar dias de folga.</div>
+      <div class="folga-form">
+        <input type="date" id="folgaData" />
+        <input type="text" id="folgaMotivo" placeholder="Motivo (ex: Feriado, Férias)" style="font-size:14px;" />
+        <button class="btn-buscar" id="btnAdicionarFolga">Adicionar folga</button>
+      </div>
+      <div id="folgaLista"></div>
     </div>
 
   </div>
@@ -1306,6 +1367,28 @@ const db   = getFirestore(app);
 const auth = getAuth(app);
 
 let nome = "", servicos = [], total = 0, dia = "", horario = "";
+let stepAtual = 1;
+
+// ── STEP TRANSITIONS ──
+function transitionToStep(n) {
+  if (n === stepAtual) return;
+  const oldStep  = document.getElementById("step" + stepAtual);
+  const newStep  = document.getElementById("step" + n);
+  const entryCls = n > stepAtual ? "entering-fwd" : "entering-back";
+
+  oldStep.classList.add("exiting");
+  oldStep.addEventListener("animationend", () => {
+    oldStep.classList.remove("active", "exiting");
+  }, { once: true });
+
+  newStep.classList.add("active", entryCls);
+  newStep.addEventListener("animationend", () => {
+    newStep.classList.remove(entryCls);
+  }, { once: true });
+
+  stepAtual = n;
+  updateProgress(n);
+}
 
 // ── PROGRESS INDICATOR ──
 function updateProgress(step) {
@@ -1395,9 +1478,16 @@ async function filtrarHorariosOcupados(diaEscolhido) {
 const diasSemana = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"];
 const meses      = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
 
-function gerarDias() {
+async function gerarDias() {
   const diasContainer = document.getElementById("dias");
   diasContainer.innerHTML = "";
+
+  // Pré-carrega dias de folga (Map: dataStr → motivo)
+  const folgasMap = {};
+  try {
+    const snapFolgas = await getDocs(collection(db, "folgas"));
+    snapFolgas.forEach(d => { folgasMap[d.data().data] = d.data().motivo; });
+  } catch(e) { console.error(e); }
 
   let agora = new Date();
   let utc   = agora.getTime() + (agora.getTimezoneOffset() * 60000);
@@ -1411,6 +1501,7 @@ function gerarDias() {
     const numAno  = data.getFullYear();
     const nomeDia = diasSemana[d];
     const nomeMes = meses[data.getMonth()];
+    const dataStringCompleta = `${nomeDia} ${numDia}/${numMes}/${numAno}`;
 
     if (d === 0) {
       card.className = "dia-card fechado";
@@ -1421,6 +1512,15 @@ function gerarDias() {
         <div class="dia-fechado-label">Fechado</div>
       `;
       diasContainer.appendChild(card);
+    } else if (folgasMap[dataStringCompleta]) {
+      card.className = "dia-card fechado";
+      card.innerHTML = `
+        <div class="dia-nome">${nomeDia}</div>
+        <div class="dia-num">${numDia}</div>
+        <div class="dia-mes">${nomeMes}</div>
+        <div class="dia-fechado-label">${folgasMap[dataStringCompleta]}</div>
+      `;
+      diasContainer.appendChild(card);
     } else {
       card.className = "dia-card";
       card.innerHTML = `
@@ -1428,7 +1528,6 @@ function gerarDias() {
         <div class="dia-num">${numDia}</div>
         <div class="dia-mes">${nomeMes}</div>
       `;
-      const dataStringCompleta = `${nomeDia} ${numDia}/${numMes}/${numAno}`;
       card.onclick = async () => {
         document.querySelectorAll(".dia-card:not(.fechado)").forEach(c => c.classList.remove("active"));
         card.classList.add("active");
@@ -1469,9 +1568,7 @@ window.nextStep = (n) => {
   if (n === 4 && !dia) {
     alert("Selecione um dia"); return;
   }
-  document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
-  document.getElementById("step" + n).classList.add("active");
-  updateProgress(n);
+  transitionToStep(n);
 };
 
 // ── MOSTRAR RESUMO (ao clicar em "Agendar pelo WhatsApp") ──
@@ -1864,6 +1961,81 @@ document.getElementById("btnConfirmar").onclick = sendWhats;
     const diaStr = dateInputToDiaStr(this.value);
     if (diaStr) carregarBloqueios(diaStr);
   };
+
+  // ── ABA 3: DIAS DE FOLGA ──
+  async function carregarFolgas() {
+    const lista = document.getElementById("folgaLista");
+    lista.innerHTML = '<div class="admin-loading">⏳ Carregando...</div>';
+    try {
+      const snap = await getDocs(collection(db, "folgas"));
+      if (snap.empty) {
+        lista.innerHTML = '<div class="admin-vazio">Nenhum dia de folga cadastrado.</div>';
+        return;
+      }
+      lista.innerHTML = "";
+      snap.forEach(d => renderFolgaItem(lista, d.id, d.data().data, d.data().motivo));
+    } catch(e) {
+      lista.innerHTML = '<div class="admin-vazio">Erro ao carregar folgas.</div>';
+    }
+  }
+
+  function renderFolgaItem(lista, id, dataStr, motivo) {
+    const item = document.createElement("div");
+    item.className = "folga-item";
+    item.id = "folga-" + id;
+    item.innerHTML = `
+      <div class="folga-item-info">
+        <div class="folga-data">${dataStr}</div>
+        <div class="folga-motivo">${motivo || "—"}</div>
+      </div>
+      <button class="btn-cancel-agend" data-id="${id}">Remover</button>
+    `;
+    item.querySelector("button").onclick = async (e) => {
+      const btn = e.currentTarget;
+      btn.textContent = "...";
+      btn.disabled = true;
+      try {
+        await deleteDoc(doc(db, "folgas", btn.dataset.id));
+        document.getElementById("folga-" + btn.dataset.id)?.remove();
+        if (!document.getElementById("folgaLista").querySelector(".folga-item")) {
+          document.getElementById("folgaLista").innerHTML =
+            '<div class="admin-vazio">Nenhum dia de folga cadastrado.</div>';
+        }
+      } catch {
+        btn.textContent = "Remover";
+        btn.disabled = false;
+        alert("Erro ao remover.");
+      }
+    };
+    lista.appendChild(item);
+  }
+
+  document.getElementById("btnAdicionarFolga").onclick = async () => {
+    const dataVal   = document.getElementById("folgaData").value;
+    const motivoVal = document.getElementById("folgaMotivo").value.trim();
+    if (!dataVal) { alert("Selecione uma data."); return; }
+    const diaStr = dateInputToDiaStr(dataVal);
+    const btn    = document.getElementById("btnAdicionarFolga");
+    btn.textContent = "Salvando...";
+    btn.disabled    = true;
+    try {
+      const novoDoc = await addDoc(collection(db, "folgas"), {
+        data: diaStr, motivo: motivoVal || "Folga"
+      });
+      document.getElementById("folgaData").value   = "";
+      document.getElementById("folgaMotivo").value = "";
+      const lista = document.getElementById("folgaLista");
+      if (lista.querySelector(".admin-vazio")) lista.innerHTML = "";
+      renderFolgaItem(lista, novoDoc.id, diaStr, motivoVal || "Folga");
+    } catch {
+      alert("Erro ao salvar folga.");
+    }
+    btn.textContent = "Adicionar folga";
+    btn.disabled    = false;
+  };
+
+  // Carrega folgas ao abrir a aba
+  document.querySelector('[data-aba="folgas"]').addEventListener("click", carregarFolgas);
 })();
 
 // ── MODAL CANCELAMENTO ──
