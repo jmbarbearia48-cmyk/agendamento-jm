@@ -589,6 +589,149 @@ input[type="text"]::placeholder { color: #444; }
 
 .btn-novo:hover { background: #2e7d32; color: #fff; }
 
+/* ── MODAL CANCELAMENTO ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.82);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal-box {
+  background: #111;
+  border: 1.5px solid #2a2a2a;
+  border-radius: 18px;
+  padding: 28px 24px 24px;
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: fadeUp .3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.modal-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  color: #f5f5f5;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+  transition: color 0.2s;
+}
+
+.modal-close:hover { color: #f5f5f5; }
+
+.modal-field {
+  margin-bottom: 14px;
+}
+
+.modal-field label {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.modal-field input,
+.modal-field select {
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 10px;
+  border: 1.5px solid #1f1f1f;
+  background: #0d0d0d;
+  color: #f5f5f5;
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease;
+  appearance: none;
+}
+
+.modal-field input:focus,
+.modal-field select:focus { border-color: #4caf50; }
+
+.modal-field select option { background: #111; }
+
+.btn-buscar {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: #2e7d32;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  margin-top: 6px;
+}
+
+.btn-buscar:hover { background: #4caf50; }
+
+.cancel-result {
+  display: none;
+  margin-top: 18px;
+  background: #0d0d0d;
+  border: 1.5px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.cancel-result .resumo-linha { font-size: 13px; }
+
+.cancel-msg {
+  display: none;
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.cancel-msg.erro { background: #140000; color: #ff6b6b; border: 1px solid #ff4d4d33; }
+.cancel-msg.ok   { background: #001a00; color: #4caf50; border: 1px solid #2e7d3244; }
+
+.btn-cancelar-conf {
+  width: 100%;
+  margin-top: 14px;
+  padding: 13px;
+  border: none;
+  border-radius: 12px;
+  background: #7f1d1d;
+  color: #fca5a5;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-cancelar-conf:hover { background: #991b1b; }
+
 /* ── FOOTER ── */
 footer {
   text-align: center;
@@ -598,6 +741,14 @@ footer {
   border-top: 1px solid #161616;
   margin-top: 10px;
 }
+
+footer a {
+  color: #3a3a3a;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+footer a:hover { color: #888; }
 </style>
 </head>
 
@@ -771,11 +922,62 @@ footer {
 
 </div>
 
-<footer>JM Barbearia © 2025</footer>
+<!-- MODAL CANCELAMENTO -->
+<div class="modal-overlay" id="modalCancelamento">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Cancelar agendamento</h3>
+      <button class="modal-close" id="btnFecharModal">✕</button>
+    </div>
+
+    <div class="modal-field">
+      <label>Nome completo</label>
+      <input type="text" id="cancelNome" placeholder="Como você se agendou" />
+    </div>
+    <div class="modal-field">
+      <label>Horário</label>
+      <select id="cancelHorario"></select>
+    </div>
+    <div class="modal-field">
+      <label>Dia</label>
+      <select id="cancelDia"></select>
+    </div>
+
+    <button class="btn-buscar" id="btnBuscarAgendamento">Buscar agendamento</button>
+
+    <div class="cancel-msg" id="cancelMsg"></div>
+
+    <div class="cancel-result" id="cancelResult">
+      <div class="resumo-linha">
+        <span class="resumo-label">Nome</span>
+        <span class="resumo-valor" id="cancelResNome"></span>
+      </div>
+      <div class="resumo-linha">
+        <span class="resumo-label">Serviços</span>
+        <span class="resumo-valor" id="cancelResServicos"></span>
+      </div>
+      <div class="resumo-linha">
+        <span class="resumo-label">Dia</span>
+        <span class="resumo-valor" id="cancelResDia"></span>
+      </div>
+      <div class="resumo-linha">
+        <span class="resumo-label">Horário</span>
+        <span class="resumo-valor" id="cancelResHorario"></span>
+      </div>
+      <div class="resumo-linha">
+        <span class="resumo-label">Total</span>
+        <span class="resumo-valor resumo-total-valor" id="cancelResTotal"></span>
+      </div>
+      <button class="btn-cancelar-conf" id="btnConfirmarCancelamento">Confirmar cancelamento</button>
+    </div>
+  </div>
+</div>
+
+<footer>JM Barbearia © 2025 &nbsp;·&nbsp; <a href="#" id="linkCancelar">Cancelar agendamento</a></footer>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCVUmJ6w44XKuINSEyl62F7PkhoN6JAVG4",
@@ -1030,6 +1232,145 @@ document.getElementById("btnStep2").onclick   = () => nextStep(3);
 document.getElementById("btnStep3").onclick   = () => nextStep(4);
 document.getElementById("btnAgendar").onclick = mostrarResumo;
 document.getElementById("btnConfirmar").onclick = sendWhats;
+
+// ── MODAL CANCELAMENTO ──
+(function() {
+  const modal      = document.getElementById("modalCancelamento");
+  const selHorario = document.getElementById("cancelHorario");
+  const selDia     = document.getElementById("cancelDia");
+
+  // Popula select de horários (09:00–21:00)
+  for (let h = 9; h <= 21; h++) {
+    const opt = document.createElement("option");
+    opt.value = opt.textContent = h.toString().padStart(2,"0") + ":00";
+    selHorario.appendChild(opt);
+  }
+
+  // Popula select de dias (mesma lógica do gerarDias)
+  const _diasSem = ["DOM","SEG","TER","QUA","QUI","SEX","SAB"];
+  const _meses   = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+  (() => {
+    let agora = new Date();
+    let utc   = agora.getTime() + (agora.getTimezoneOffset() * 60000);
+    let data  = new Date(utc + (3600000 * -3));
+    let count = 0;
+    while (count < 7) {
+      const d = data.getDay();
+      if (d >= 1 && d <= 6) {
+        const numDia  = data.getDate();
+        const numMes  = data.getMonth() + 1;
+        const numAno  = data.getFullYear();
+        const nomeDia = _diasSem[d];
+        const nomeMes = _meses[data.getMonth()];
+        const valor   = `${nomeDia} ${numDia}/${numMes}/${numAno}`;
+        const opt = document.createElement("option");
+        opt.value = valor;
+        opt.textContent = `${nomeDia} ${numDia} ${nomeMes}`;
+        selDia.appendChild(opt);
+        count++;
+      }
+      data.setDate(data.getDate() + 1);
+    }
+  })();
+
+  // Abrir / fechar modal
+  document.getElementById("linkCancelar").onclick = (e) => {
+    e.preventDefault();
+    resetModal();
+    modal.classList.add("open");
+  };
+  document.getElementById("btnFecharModal").onclick = () => modal.classList.remove("open");
+  modal.addEventListener("click", (e) => { if (e.target === modal) modal.classList.remove("open"); });
+
+  function resetModal() {
+    document.getElementById("cancelNome").value        = "";
+    document.getElementById("cancelMsg").style.display    = "none";
+    document.getElementById("cancelResult").style.display = "none";
+    document.getElementById("btnBuscarAgendamento").disabled = false;
+    document.getElementById("btnBuscarAgendamento").textContent = "Buscar agendamento";
+  }
+
+  function showMsg(texto, tipo) {
+    const el = document.getElementById("cancelMsg");
+    el.textContent   = texto;
+    el.className     = "cancel-msg " + tipo;
+    el.style.display = "block";
+  }
+
+  let docIdParaCancelar = null;
+
+  // Buscar agendamento
+  document.getElementById("btnBuscarAgendamento").onclick = async () => {
+    const nomeVal    = document.getElementById("cancelNome").value.trim();
+    const horarioVal = selHorario.value;
+    const diaVal     = selDia.value;
+
+    if (!nomeVal) { showMsg("Digite seu nome completo.", "erro"); return; }
+
+    document.getElementById("cancelMsg").style.display    = "none";
+    document.getElementById("cancelResult").style.display = "none";
+    docIdParaCancelar = null;
+
+    const btn = document.getElementById("btnBuscarAgendamento");
+    btn.textContent = "Buscando...";
+    btn.disabled    = true;
+
+    try {
+      const q    = query(
+        collection(db, "agendamento"),
+        where("cliente",  "==", nomeVal),
+        where("horario",  "==", horarioVal),
+        where("dia",      "==", diaVal)
+      );
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        showMsg("Agendamento não encontrado. Verifique os dados.", "erro");
+      } else {
+        const docSnap = snap.docs[0];
+        docIdParaCancelar = docSnap.id;
+        const d = docSnap.data();
+        const nomesSvc = Array.isArray(d.servicos)
+          ? d.servicos.map(s => s.nome).join(", ")
+          : (d.servicos || "—");
+
+        document.getElementById("cancelResNome").textContent     = d.cliente;
+        document.getElementById("cancelResServicos").textContent = nomesSvc;
+        document.getElementById("cancelResDia").textContent      = d.dia;
+        document.getElementById("cancelResHorario").textContent  = d.horario;
+        document.getElementById("cancelResTotal").textContent    = "R$" + (d.total || 0);
+
+        document.getElementById("cancelResult").style.display = "block";
+        document.getElementById("btnConfirmarCancelamento").disabled    = false;
+        document.getElementById("btnConfirmarCancelamento").textContent = "Confirmar cancelamento";
+      }
+    } catch(e) {
+      showMsg("Erro de conexão. Tente novamente.", "erro");
+    }
+
+    btn.textContent = "Buscar agendamento";
+    btn.disabled    = false;
+  };
+
+  // Confirmar cancelamento
+  document.getElementById("btnConfirmarCancelamento").onclick = async () => {
+    if (!docIdParaCancelar) return;
+    const btn = document.getElementById("btnConfirmarCancelamento");
+    btn.textContent = "Cancelando...";
+    btn.disabled    = true;
+
+    try {
+      await deleteDoc(doc(db, "agendamento", docIdParaCancelar));
+      document.getElementById("cancelResult").style.display = "none";
+      showMsg("✅ Agendamento cancelado com sucesso!", "ok");
+      docIdParaCancelar = null;
+    } catch(e) {
+      showMsg("Erro ao cancelar. Tente novamente.", "erro");
+      btn.textContent = "Confirmar cancelamento";
+      btn.disabled    = false;
+    }
+  };
+})();
 </script>
 
 </body>
