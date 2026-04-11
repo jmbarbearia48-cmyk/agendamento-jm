@@ -878,30 +878,28 @@ footer a:hover { color: #888; }
 #adminPanel {
   display: none;
   min-height: 100vh;
-  background: #0a0a0a;
+  background: #050505;
 }
 
 .admin-header {
   background: #000;
   border-bottom: 2px solid #2e7d32;
-  padding: 16px 20px;
+  padding: 14px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.admin-header h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: 20px;
-  color: #f5f5f5;
-  margin: 0;
-}
+.admin-header-brand { display: flex; flex-direction: column; gap: 2px; }
+.admin-header-sub   { font-size: 10px; color: #c9a84c; letter-spacing: 2px; text-transform: uppercase; font-family: 'Inter', sans-serif; }
+.admin-header-title { font-size: 17px; font-weight: 700; color: #f5f5f5; font-family: 'Inter', sans-serif; letter-spacing: 0.3px; }
+
 .btn-sair {
-  padding: 8px 16px;
-  border: 1.5px solid #333;
+  padding: 7px 14px;
+  border: 1px solid #333;
   border-radius: 8px;
   background: transparent;
-  color: #888;
-  font-size: 13px;
+  color: #666;
+  font-size: 12px;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
   transition: all 0.2s;
@@ -910,42 +908,48 @@ footer a:hover { color: #888; }
 
 .admin-tabs {
   display: flex;
-  background: #000;
-  border-bottom: 1px solid #1f1f1f;
+  background: #0d0d0d;
+  border-bottom: 1px solid #1a1a1a;
   padding: 0 16px;
   overflow-x: auto;
 }
 .admin-tab {
-  padding: 14px 16px;
-  font-size: 13px;
+  padding: 13px 16px;
+  font-size: 12px;
   font-weight: 600;
   font-family: 'Inter', sans-serif;
   color: #555;
   cursor: pointer;
   border: none;
-  border-bottom: 2px solid transparent;
+  border-bottom: 3px solid transparent;
   background: none;
   white-space: nowrap;
   transition: all 0.2s;
+  letter-spacing: 0.3px;
 }
 .admin-tab:hover  { color: #aaa; }
-.admin-tab.active { color: #4caf50; border-bottom-color: #4caf50; }
+.admin-tab.active { color: #fff; border-bottom-color: #4caf50; }
 
-.admin-content { padding: 24px 20px; max-width: 700px; margin: 0 auto; }
+.admin-content { padding: 22px 20px; max-width: 700px; margin: 0 auto; }
 .admin-aba        { display: none; }
 .admin-aba.active { display: block; }
 
+.admin-date-label {
+  display: block;
+  font-size: 11px;
+  color: #888;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
 .admin-date-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 .admin-date-row input[type="date"] {
-  flex: 1;
+  width: 100%;
   padding: 12px 14px;
   border-radius: 10px;
-  border: 1.5px solid #1f1f1f;
+  border: 1.5px solid #2a2a2a;
   background: #111;
   color: #f5f5f5;
   font-size: 14px;
@@ -954,54 +958,112 @@ footer a:hover { color: #888; }
   transition: border-color 0.2s;
 }
 .admin-date-row input[type="date"]:focus { border-color: #4caf50; }
-.admin-date-row input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.5); }
+.admin-date-row input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.4); }
 
 .admin-contador {
-  font-size: 13px;
-  color: #888;
-  margin-bottom: 16px;
-  padding: 10px 14px;
-  background: #111;
-  border-radius: 10px;
-  border: 1px solid #1f1f1f;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
 }
-.admin-contador strong { color: #4caf50; }
+.admin-badge-agend {
+  background: #0a2010;
+  color: #4caf50;
+  border: 1px solid #2e7d32;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+}
+.admin-badge-total {
+  background: #1a1500;
+  color: #c9a84c;
+  border: 1px solid #5a4500;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+}
 
 .agend-card {
-  background: #111;
-  border: 1.5px solid #1f1f1f;
-  border-radius: 14px;
-  padding: 16px 18px;
+  background: #0f0f0f;
+  border: 1px solid #1a1a1a;
+  border-left: 3px solid #2e7d32;
+  border-radius: 12px;
+  padding: 16px;
   margin-bottom: 12px;
+  animation: fadeUp .25s ease;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+.agend-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.agend-hora {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+  font-family: 'Inter', sans-serif;
+}
+.agend-badge-dia {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4caf50;
+  background: #0a2010;
+  border-radius: 6px;
+  padding: 3px 8px;
+  letter-spacing: 0.5px;
+}
+.agend-nome {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f5f5f5;
+  margin-bottom: 5px;
+}
+.agend-servicos {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.agend-card-footer {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 14px;
-  animation: fadeUp .25s ease;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid #1a1a1a;
 }
-.agend-card-info { flex: 1; }
-.agend-hora     { font-size: 22px; font-weight: 700; color: #4caf50; line-height: 1; margin-bottom: 6px; }
-.agend-nome     { font-size: 15px; font-weight: 600; color: #f5f5f5; margin-bottom: 3px; }
-.agend-servicos { font-size: 12px; color: #888; margin-bottom: 3px; }
-.agend-total    { font-size: 13px; font-weight: 600; color: #c9a84c; }
+.agend-total { font-size: 14px; font-weight: 700; color: #c9a84c; }
 
 .btn-cancel-agend {
-  padding: 8px 14px;
-  border: 1.5px solid #7f1d1d;
+  padding: 6px 12px;
+  border: 1px solid #7f1d1d;
   border-radius: 8px;
-  background: transparent;
+  background: #1a0000;
   color: #fca5a5;
   font-size: 12px;
   font-weight: 600;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
   white-space: nowrap;
-  flex-shrink: 0;
 }
-.btn-cancel-agend:hover { background: #7f1d1d; }
+.btn-cancel-agend:hover { background: #7f1d1d; color: #fff; }
 
-.admin-vazio   { text-align: center; color: #444; font-size: 14px; padding: 40px 0; }
+.admin-vazio {
+  text-align: center;
+  padding: 48px 0 32px;
+}
+.admin-vazio-icon   { font-size: 40px; display: block; margin-bottom: 14px; opacity: 0.5; }
+.admin-vazio-texto  { color: #444; font-size: 14px; margin-bottom: 6px; }
+.admin-vazio-sub    { color: #333; font-size: 12px; }
+
 .admin-loading { text-align: center; color: #4caf50; font-size: 13px; padding: 20px 0; animation: blink 1.4s infinite; }
 
 .folga-form {
@@ -1328,7 +1390,10 @@ footer a:hover { color: #888; }
 <!-- PAINEL ADMIN -->
 <div id="adminPanel">
   <div class="admin-header">
-    <h2>⚙ Painel JM Barbearia</h2>
+    <div class="admin-header-brand">
+      <span class="admin-header-sub">JM Barbearia</span>
+      <span class="admin-header-title">Painel Admin</span>
+    </div>
     <button class="btn-sair" id="btnAdminSair">Sair</button>
   </div>
   <div class="admin-tabs">
@@ -1341,6 +1406,7 @@ footer a:hover { color: #888; }
     <!-- ABA 1 — AGENDAMENTOS -->
     <div class="admin-aba active" id="abaAgendamentos">
       <div class="admin-date-row">
+        <label class="admin-date-label">Selecionar data:</label>
         <input type="date" id="adminDataFiltro" />
       </div>
       <div class="admin-contador" id="adminContador" style="display:none;"></div>
@@ -1822,7 +1888,12 @@ document.getElementById("btnConfirmar").onclick = sendWhats;
       const snap = await getDocs(q);
 
       if (snap.empty) {
-        lista.innerHTML = '<div class="admin-vazio">Nenhum agendamento para este dia.</div>';
+        lista.innerHTML = `
+          <div class="admin-vazio">
+            <span class="admin-vazio-icon">📅</span>
+            <div class="admin-vazio-texto">Nenhum agendamento para este dia</div>
+            <div class="admin-vazio-sub">Selecione uma data acima</div>
+          </div>`;
         return;
       }
 
@@ -1832,26 +1903,33 @@ document.getElementById("btnConfirmar").onclick = sendWhats;
       docs.sort((a, b) => a.horario.localeCompare(b.horario));
 
       const totalGeral = docs.reduce((acc, d) => acc + (d.total || 0), 0);
-      contador.innerHTML = `<strong>${docs.length}</strong> agendamento${docs.length !== 1 ? "s" : ""} &nbsp;·&nbsp; Total: <strong>R$${totalGeral}</strong>`;
-      contador.style.display = "block";
+      contador.innerHTML = `
+        <span class="admin-badge-agend">${docs.length} agendamento${docs.length !== 1 ? "s" : ""}</span>
+        <span class="admin-badge-total">Total: R$${totalGeral}</span>
+      `;
+      contador.style.display = "flex";
 
       lista.innerHTML = "";
       docs.forEach(ag => {
         const nomesSvc = Array.isArray(ag.servicos)
-          ? ag.servicos.map(s => s.nome).join(", ")
+          ? ag.servicos.map(s => s.nome).join(" · ")
           : (ag.servicos || "—");
+        const badgeDia = ag.dia ? ag.dia.split(" ")[0] : "";
 
         const card = document.createElement("div");
         card.className = "agend-card";
         card.id = "agcard-" + ag.id;
         card.innerHTML = `
-          <div class="agend-card-info">
+          <div class="agend-card-header">
             <div class="agend-hora">${ag.horario}</div>
-            <div class="agend-nome">${ag.cliente}</div>
-            <div class="agend-servicos">${nomesSvc}</div>
-            <div class="agend-total">R$${ag.total || 0}</div>
+            <div class="agend-badge-dia">${badgeDia}</div>
           </div>
-          <button class="btn-cancel-agend" data-id="${ag.id}">Cancelar</button>
+          <div class="agend-nome">👤 ${ag.cliente}</div>
+          <div class="agend-servicos">${nomesSvc}</div>
+          <div class="agend-card-footer">
+            <div class="agend-total">R$${ag.total || 0}</div>
+            <button class="btn-cancel-agend" data-id="${ag.id}">Cancelar</button>
+          </div>
         `;
         lista.appendChild(card);
       });
@@ -1868,14 +1946,21 @@ document.getElementById("btnConfirmar").onclick = sendWhats;
             // Atualizar contador
             const restantes = lista.querySelectorAll(".agend-card");
             if (restantes.length === 0) {
-              lista.innerHTML = '<div class="admin-vazio">Nenhum agendamento para este dia.</div>';
+              lista.innerHTML = `
+                <div class="admin-vazio">
+                  <span class="admin-vazio-icon">📅</span>
+                  <div class="admin-vazio-texto">Nenhum agendamento para este dia</div>
+                </div>`;
               contador.style.display = "none";
             } else {
               const novoTotal = Array.from(restantes).reduce((acc, c) => {
                 const t = parseInt(c.querySelector(".agend-total").textContent.replace("R$","")) || 0;
                 return acc + t;
               }, 0);
-              contador.innerHTML = `<strong>${restantes.length}</strong> agendamento${restantes.length !== 1 ? "s" : ""} &nbsp;·&nbsp; Total: <strong>R$${novoTotal}</strong>`;
+              contador.innerHTML = `
+                <span class="admin-badge-agend">${restantes.length} agendamento${restantes.length !== 1 ? "s" : ""}</span>
+                <span class="admin-badge-total">Total: R$${novoTotal}</span>
+              `;
             }
           } catch {
             btn.textContent = "Cancelar";
@@ -1886,7 +1971,7 @@ document.getElementById("btnConfirmar").onclick = sendWhats;
       });
 
     } catch(e) {
-      lista.innerHTML = '<div class="admin-vazio">Erro ao carregar agendamentos.</div>';
+      lista.innerHTML = `<div class="admin-vazio"><span class="admin-vazio-icon">⚠️</span><div class="admin-vazio-texto">Erro ao carregar agendamentos</div></div>`;
       console.error(e);
     }
   }
